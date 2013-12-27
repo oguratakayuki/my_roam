@@ -50,6 +50,7 @@ class MessageLog
 end
 
 def write_screen(user_list)
+  #[{"user_id"=>1, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}, {"user_id"=>2, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}, {"user_id"=>3, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}]
   win = Window.new(height=30,width=60, y=15 , x=50 )
   win.box(?|, ?-)
   user_list.each do |user|
@@ -94,8 +95,11 @@ def create_receive_process
             #client.close
             puts "recieve message!!!#{message.to_s}"
     logger.error  "recieve message!!!#{message.to_s}"
-            write_screen(message)
-            write_sub(chara.get_message)
+    #{"cmd"=>"update_all_user_position", "params"=>[{"user_id"=>1, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}, {"user_id"=>2, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}, {"user_id"=>3, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}]}
+            if message['cmd'] == 'update_all_user_position'
+              write_screen(message['params'])
+              write_sub(chara.get_message)
+            end
             refresh
           end
         rescue
