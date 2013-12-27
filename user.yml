@@ -1,0 +1,17 @@
+accepter_setting:
+  ip:
+  port: 10004
+server_user:
+  id: 'ogura'
+  scheduler_account:
+    id:
+    pw:
+  
+user_list:
+  ogura:
+    mail_id: 'ogura'
+    scheduler_id: '小倉 貴之'
+    notice_type: 'normal'
+    ip: '192.168.12.3'
+    port: '10004'
+

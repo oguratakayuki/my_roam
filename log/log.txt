@@ -1,0 +1,27 @@
+# Logfile created on 2013-12-27 14:22:22 +0900 by logger.rb/25413
+E, [2013-12-27T14:22:25.855176 #18649] ERROR -- : new_user_id accepted
+E, [2013-12-27T14:24:29.339314 #18684] ERROR -- : new_user_id accepted
+E, [2013-12-27T14:24:55.128229 #18693] ERROR -- : new_user_id accepted
+E, [2013-12-27T14:26:41.971772 #18716] ERROR -- : new_user_id accepted
+E, [2013-12-27T14:26:44.972300 #18716] ERROR -- : move accepted
+E, [2013-12-27T14:44:27.883636 #18769] ERROR -- : new_user_id accepted
+E, [2013-12-27T14:44:30.884918 #18769] ERROR -- : move accepted
+E, [2013-12-27T14:47:50.867963 #18850] ERROR -- : new_user_id accepted
+E, [2013-12-27T14:47:53.868499 #18850] ERROR -- : move accepted
+E, [2013-12-27T14:48:04.604708 #18861] ERROR -- : new_user_id accepted
+E, [2013-12-27T14:48:07.605256 #18861] ERROR -- : move accepted
+E, [2013-12-27T14:54:36.332389 #18881] ERROR -- : new_user_id accepted
+E, [2013-12-27T14:54:39.332927 #18881] ERROR -- : move accepted
+E, [2013-12-27T14:55:27.349062 #18903] ERROR -- : new_user_id accepted
+E, [2013-12-27T14:55:30.349535 #18903] ERROR -- : move accepted
+E, [2013-12-27T14:57:24.708510 #18927] ERROR -- : new_user_id accepted
+E, [2013-12-27T15:00:23.515047 #18957] ERROR -- : new_user_id accepted
+E, [2013-12-27T15:00:26.515493 #18957] ERROR -- : move accepted
+E, [2013-12-27T16:23:38.983414 #19130] ERROR -- : new_user_id accepted
+E, [2013-12-27T16:23:41.983874 #19130] ERROR -- : move accepted
+E, [2013-12-27T16:26:09.323240 #19163] ERROR -- : new_user_id accepted
+E, [2013-12-27T16:26:12.323679 #19163] ERROR -- : move accepted
+E, [2013-12-27T16:27:30.651685 #19186] ERROR -- : new_user_id accepted
+E, [2013-12-27T16:27:33.652173 #19186] ERROR -- : move accepted
+E, [2013-12-27T16:29:33.342483 #19223] ERROR -- : new_user_id accepted
+E, [2013-12-27T16:29:36.343027 #19223] ERROR -- : move accepted

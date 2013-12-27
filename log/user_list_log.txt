@@ -1,0 +1,1 @@
+# Logfile created on 2013-12-27 14:44:24 +0900 by logger.rb/25413

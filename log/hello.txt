@@ -1,0 +1,7 @@
+# Logfile created on 2013-12-27 19:30:04 +0900 by logger.rb/25413
+E, [2013-12-27T19:30:07.100102 #24541] ERROR -- : recieve message!!!{"cmd"=>"update_all_user_position", "params"=>[{"user_id"=>1, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}]}
+E, [2013-12-27T19:30:46.903217 #24557] ERROR -- : recieve message!!!{"cmd"=>"update_all_user_position", "params"=>[{"user_id"=>1, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}, {"user_id"=>2, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}]}
+E, [2013-12-27T19:30:46.904529 #24560] ERROR -- : recieve message!!!{"cmd"=>"update_all_user_position", "params"=>[{"user_id"=>1, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}, {"user_id"=>2, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}]}
+E, [2013-12-27T19:31:15.110988 #24569] ERROR -- : recieve message!!!{"cmd"=>"update_all_user_position", "params"=>[{"user_id"=>1, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}, {"user_id"=>2, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}, {"user_id"=>3, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}]}
+E, [2013-12-27T19:31:15.112353 #24572] ERROR -- : recieve message!!!{"cmd"=>"update_all_user_position", "params"=>[{"user_id"=>1, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}, {"user_id"=>2, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}, {"user_id"=>3, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}]}
+E, [2013-12-27T19:31:15.114654 #24575] ERROR -- : recieve message!!!{"cmd"=>"update_all_user_position", "params"=>[{"user_id"=>1, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}, {"user_id"=>2, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}, {"user_id"=>3, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}]}
