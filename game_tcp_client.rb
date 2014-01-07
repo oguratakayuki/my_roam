@@ -7,18 +7,18 @@ require 'logger'
 
 class GameTcpClient
   def initialize
-    @ip = '192.168.12.3'
+    @ip = '192.168.12.25'
     @port = '10004'
-    @server_ip = '192.168.12.3'
+    @server_ip = '192.168.12.25'
     @server_port = '10005'
   end
 
   def get_new_user_id
     message = {'cmd' => "new_user_id"}.to_json
     result = self.send(message)
-    puts 'new_user_id result = ' + result.to_s
+    #puts 'new_user_id result = ' + result.to_s
     result = JSON.parse(result)['user_id']
-    puts 'after parse'
+    #puts 'after parse'
     return result
   end
 
@@ -42,12 +42,14 @@ class GameTcpClient
     @server_ip = ip if ip
     @server_port = port if port
     #@logger.error "to open #{@server_ip},#{@server_port}"
+    #puts @server_ip
+    #puts @server_port
     s = TCPSocket.open(@server_ip, @server_port)
-    puts 'start'
-    puts message_with_json
+    #puts 'start'
+    #puts message_with_json
     s.puts(message_with_json)
     result = s.gets
-    puts "server result is #{result.to_s}"
+    #puts "server result is #{result.to_s}"
     s.close
     return result
   end

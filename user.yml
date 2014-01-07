@@ -12,6 +12,6 @@ user_list:
     mail_id: 'ogura'
     scheduler_id: '小倉 貴之'
     notice_type: 'normal'
-    ip: '192.168.12.3'
+    ip: '192.168.12.25'
     port: '10004'
 
