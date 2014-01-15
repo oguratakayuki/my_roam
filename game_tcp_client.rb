@@ -24,7 +24,7 @@ class GameTcpClient
 
   def move(user_id, x, y)
     message = {'cmd' => "move", :params => {:user_id => user_id, :x => x, :y => y}}.to_json
-    result = self.send(message)
+    self.send_only(message)
   end
 
   def send_all_current_position(user_list, ip_port_list)
@@ -34,7 +34,7 @@ class GameTcpClient
     message = {'cmd' => 'update_all_user_position', :params => user_list}.to_json
     ip_port_list.each do |ip_port|
       @logger.error "send_All_current_position!!!ip=#{ip_port[:ip]},port=#{ip_port[:port]},user_list=#{user_list.to_s}"
-      self.send(message, ip_port[:ip], ip_port[:port])
+      self.send_only(message, ip_port[:ip], ip_port[:port])
     end
   end
 
@@ -45,13 +45,33 @@ class GameTcpClient
     #puts @server_ip
     #puts @server_port
     s = TCPSocket.open(@server_ip, @server_port)
-    #puts 'start'
+    #puts 'start send'
     #puts message_with_json
     s.puts(message_with_json)
     result = s.gets
+    #puts 'end send'
     #puts "server result is #{result.to_s}"
     s.close
     return result
   end
+
+  def send_only(message_with_json, ip=nil, port=nil)
+    @server_ip = ip if ip
+    @server_port = port if port
+    #@logger.error "to open #{@server_ip},#{@server_port}"
+    s = TCPSocket.open(@server_ip, @server_port)
+    #puts 'start send'
+    #puts message_with_json
+    s.puts(message_with_json)
+    #puts 'end send'
+    #puts "server result is #{result.to_s}"
+    s.close
+    return
+  end
+
+
+
+
+
 
 end
