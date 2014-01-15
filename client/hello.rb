@@ -60,9 +60,9 @@ def write_screen(user_list)
     win.setpos(user['y'], user['x'])
     win.addstr(user['user_id'].to_s)
   end
-  sleep 1.5
+#sleep 1.5
   win.refresh
-  sleep 1.5
+#sleep 1.5
   win.close
 end
 
@@ -75,7 +75,7 @@ def write_sub(message_list)
     win.addstr(message + "\n")
   end
   win.refresh
-  sleep 0.5
+#sleep 0.5
   win.close
 end
 
@@ -125,7 +125,7 @@ begin
   server = TCPServer.new(10006)
   loop do
     #puts 'here'
-    sleep 1
+#sleep 1
     Thread.start do
       #puts 'accept1'
       while true
