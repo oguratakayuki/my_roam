@@ -80,26 +80,43 @@ def write_sub(message_list)
 end
 
 def create_receive_process
-  q = Queue.new
+  #q = Queue.new
+  #Thread.start do
+  #  server = TCPServer.new(10006)
+  #  begin
+  #    while true
+  #      client = server.accept
+  #      message = client.gets
+  #      next if message == nil
+  #      message = message.chomp
+  #      message = JSON.parse(message)
+  #      client.puts 'ok'
+  #      q.push(message)
+  #      client.close
+  #    end
+  #  rescue
+  #  ensure
+  #    client.close
+  #  end
+  #end
+  #return q
+  server_queue = Queue.new
+  server = TCPServer.new(10006)
   Thread.start do
-    server = TCPServer.new(10006)
-    begin
-      while true
-        client = server.accept
-        message = client.gets
-        next if message == nil
-        message = message.chomp
-        message = JSON.parse(message)
-        client.puts 'ok'
-        q.push(message)
-        client.close
-      end
-    rescue
-    ensure
-      client.close
+    while true
+      # クライアントからの接続をacceptする
+      sock = server.accept
+      # クライアントからのデータを全て受け取る
+      message = sock.gets
+      next if message == nil
+      message = message.chomp
+      message = JSON.parse(message)
+      server_queue.push(message)
+      # acceptしたソケットを閉じる
+      sock.close
     end
   end
-  return q
+  server_queue
 end
 
 def create_wait_client_event_process
@@ -113,45 +130,19 @@ def create_wait_client_event_process
   return q
 end
 
-
 begin
   #for test start
   init_screen
-  #stdscr.keypad true
   chara = Character.new(1,1)
   client_queue = create_wait_client_event_process
-  #server_queue = create_receive_process
-  server_queue = Queue.new
-  server = TCPServer.new(10006)
+  server_queue = create_receive_process
   loop do
-    #puts 'here'
-#sleep 1
-    Thread.start do
-      #puts 'accept1'
-      while true
-        # クライアントからの接続をacceptする
-        sock = server.accept
-        # クライアントからのデータを全て受け取る
-        message = sock.gets
-        next if message == nil
-        message = message.chomp
-        message = JSON.parse(message)
-        server_queue.push(message)
-        # acceptしたソケットを閉じる
-        sock.close
-      end
-    end
     if server_queue.empty? == false
-      #1puts 'sever data get!!!'
       message = server_queue.pop
       if message.instance_of?(Hash) && message['cmd'] == 'update_all_user_position'
-        #puts message['params']
         write_screen(message['params'])
         write_sub(chara.get_message)
       else
-        #puts message.to_s
-        #sleep 2
-        #abort
       end
     elsif client_queue.empty? == false
       key = client_queue.pop
