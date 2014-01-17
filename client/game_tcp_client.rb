@@ -16,9 +16,7 @@ class GameTcpClient
   def get_new_user_id
     message = {'cmd' => "new_user_id"}.to_json
     result = self.send(message)
-    #puts 'new_user_id result = ' + result.to_s
     result = JSON.parse(result)['user_id']
-    #puts 'after parse'
     return result
   end
 
@@ -27,30 +25,12 @@ class GameTcpClient
     self.send_only(message)
   end
 
-  def send_all_current_position(user_list, ip_port_list)
-
-    @logger = Logger.new('./log/tcp_client_log.txt')
-    @logger.level = Logger::WARN
-    message = {'cmd' => 'update_all_user_position', :params => user_list}.to_json
-    ip_port_list.each do |ip_port|
-      @logger.error "send_All_current_position!!!ip=#{ip_port[:ip]},port=#{ip_port[:port]},user_list=#{user_list.to_s}"
-      self.send_only(message, ip_port[:ip], ip_port[:port])
-    end
-  end
-
   def send(message_with_json, ip=nil, port=nil)
     @server_ip = ip if ip
     @server_port = port if port
-    #@logger.error "to open #{@server_ip},#{@server_port}"
-    #puts @server_ip
-    #puts @server_port
     s = TCPSocket.open(@server_ip, @server_port)
-    #puts 'start send'
-    #puts message_with_json
     s.puts(message_with_json)
     result = s.gets
-    #puts 'end send'
-    #puts "server result is #{result.to_s}"
     s.close
     return result
   end
@@ -58,20 +38,9 @@ class GameTcpClient
   def send_only(message_with_json, ip=nil, port=nil)
     @server_ip = ip if ip
     @server_port = port if port
-    #@logger.error "to open #{@server_ip},#{@server_port}"
     s = TCPSocket.open(@server_ip, @server_port)
-    #puts 'start send'
-    #puts message_with_json
     s.puts(message_with_json)
-    #puts 'end send'
-    #puts "server result is #{result.to_s}"
     s.close
     return
   end
-
-
-
-
-
-
 end
