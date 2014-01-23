@@ -1,13 +1,23 @@
 class Display
-  def initialize
-    @window_position_x = 50
-    @window_position_y = 15
-    @window_width = 60
-    @window_height = 30
-    @sub_window_position_x = 50
-    @sub_window_position_y = 45
-    @sub_window_width = 60
-    @sub_window_height = 10
+  def initialize(window_info)
+
+    @window_position_x = window_info['main_position_x']
+    @window_position_y = window_info['main_position_y']
+    @window_width = window_info['main_width']
+    @window_height = window_info['main_height']
+    @sub_window_position_x = window_info['sub_position_x']
+    @sub_window_position_y = window_info['sub_position_y']
+    @sub_window_width = window_info['sub_width']
+    @sub_window_height = window_info['sub_height']
+
+    #@window_position_x = 50
+    #@window_position_y = 15
+    #@window_width = 60
+    #@window_height = 30
+    #@sub_window_position_x = 50
+    #@sub_window_position_y = 45
+    #@sub_window_width = 60
+    #@sub_window_height = 10
     init_screen
   end
   def initialize_view
@@ -29,6 +39,7 @@ class Display
       win.addstr(user['user_id'].to_s)
     end
     win.refresh
+sleep 1
     win.close
   end
   def write_sub(message_list)

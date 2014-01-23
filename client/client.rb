@@ -10,9 +10,7 @@ include Curses
 
 class Character
   attr_reader :x, :y, :id
-  def initialize(x,y)
-    @tcp_client = GameTcpClient.new
-    @id = @tcp_client.get_new_user_id
+  def initialize(user_id, x, y)
     @x = x
     @y = y
     @message_log = MessageLog.new
@@ -21,7 +19,7 @@ class Character
     @x = @x + x
     @y = @y + y
     @message_log.add("move to #{@x},#{@y}")
-    @tcp_client.move(@id, @x, @y)
+    #@tcp_client.move(@id, @x, @y)
   end
   def get_message
     @message_log.get
@@ -96,9 +94,13 @@ end
 begin
   #for test start
 #init_screen
-  display = Display.new
-  display.initialize_view
-  chara = Character.new(1,1)
+  tcp_client = GameTcpClient.new
+  display = Display.new(tcp_client.get_display_info)
+  display.write(user_list=[], message_list=[])
+  #display.initialize_view
+  user_id = tcp_client.get_new_user_id
+  position = tcp_client.init_user_position(user_id)
+  chara = Character.new(user_id, position['x'], position['y'])
   client_queue = create_wait_client_event_process
   server_queue = create_receive_process
   loop do
@@ -112,19 +114,19 @@ begin
       key = client_queue.pop
       case key
       when Curses::Key::RIGHT
-        chara.move(1,0)
+        tcp_client.move(user_id, chara.x + 1 , chara.y) and chara.move(1,0)
       when Curses::Key::LEFT
-        chara.move(-1,0)
+        tcp_client.move(user_id, chara.x - 1 , chara.y) and chara.move(-1,0)
       when Curses::Key::UP
-        chara.move(0,-1)
+        tcp_client.move(user_id, chara.x, chara.y - 1) and chara.move(0, -1)
       when Curses::Key::DOWN
-        chara.move(0,1)
+        tcp_client.move(user_id, chara.x, chara.y + 1) and chara.move(0, 1)
       else
         abort
         close_screen
       end
     end
-    sleep 0.1
+    #sleep 0.1
   end
 ensure
   #close_screen

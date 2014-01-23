@@ -26,6 +26,12 @@ class UserList
     @user_list << user
     user.id
   end
+  def get_user_by_position(x, y)
+    @user_list.detect{|t| t.x == x && t.y == y}
+  end
+  def find(user_id)
+    user = @user_list.detect{|t| t.id == user_id}
+  end
   def update_by_id(user_id, x, y)
     user = @user_list.detect{|t| t.id == user_id}
     user.update_position(x,y)
@@ -37,4 +43,5 @@ class UserList
     @user_list.map{|user| {:user_id => user.id, :ip => user.ip, :x => user.x, :y => user.y } }
   end
 end
+
 
