@@ -5,6 +5,7 @@ require 'curses'
 require './game_tcp_client.rb'
 require './display.rb'
 require 'json'
+require 'logger'
 
 include Curses
 
@@ -94,12 +95,17 @@ end
 begin
   #for test start
 #init_screen
+
+  logger = Logger.new('./log/tcp_server_log.txt')
+  logger.level = Logger::WARN
+
   tcp_client = GameTcpClient.new
   display = Display.new(tcp_client.get_display_info)
   display.write(user_list=[], message_list=[])
   #display.initialize_view
   user_id = tcp_client.get_new_user_id
   position = tcp_client.init_user_position(user_id)
+  logger.error "initial position #{position.to_s}"
   chara = Character.new(user_id, position['x'], position['y'])
   client_queue = create_wait_client_event_process
   server_queue = create_receive_process

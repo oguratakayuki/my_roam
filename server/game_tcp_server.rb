@@ -56,11 +56,14 @@ class GameTcpServer
         elsif message['cmd'] == 'move'
           @logger.error 'move accepted'
           user = @user_list.find(message['params']['user_id'])
+          @logger.error 'here'
           move_status = @map.move(user.id, user.x, user.y, message['params']['x'], message['params']['y'])
+          @logger.error "here2 move_status = #{move_status.to_s}"
           if move_status
             user.update_position(message['params']['x'], message['params']['y'])
           end
           result = {:move_status => move_status}.to_json
+          @logger.error "move result = #{JSON.parse(result).to_s}"
           sock.puts result
           if move_status
             send_message_to_all_client('update_all_user_position', @user_list.ips_and_ports, @user_list.positions)
@@ -78,9 +81,9 @@ class GameTcpServer
           result = window_info.to_json
           sock.puts result
         elsif message['cmd'] == 'init_user_position'
-          #position = @user_list.detect_movable_position
           #position決定
           position = @map.find_free_space.sample
+          @map.move(message['params']['user_id'], nil, nil, position['x'], position['y'])
           #position = {'x' => 3, 'y' => 4}
           #更新
           @user_list.update_by_id(message['params']['user_id'], position['x'], position['y'])

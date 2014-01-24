@@ -26,7 +26,7 @@ class Map
     @map.each_with_index do |list, y_index|
       list.each_with_index do |pos, x_index|
         if is_empty_position?(x_index, y_index)
-          result << {:x => x_index, :y => y_index }
+          result << {'x' => x_index, 'y' => y_index }
         end
       end
     end
@@ -38,7 +38,7 @@ class Map
     @mutex.lock
     begin
       if is_empty_position?(to_x, to_y)
-        unset(from_x, from_y, 'user', user_id)
+        unset(from_x, from_y, 'user', user_id) if from_x != nil && from_y != nil
         set(to_x, to_y, 'user', user_id)
         result = true
       else
@@ -50,14 +50,16 @@ class Map
     return result
   end
 
-  end
 
   def is_exist_position?(x, y)
     return x < @width && y < @height
   end
   def is_empty_position?(x, y)
-    return @map[y][x] == nil ? true : false
+      return @map[y][x] == nil ? true : false
   end
+
+
+  private
   def set(x, y, element_type, element_id)
     x, y = normalize_index(x, y)
     if is_empty_position?(x, y)
@@ -73,11 +75,11 @@ class Map
   end
   def unset(x, y, element_type, element_id)
     x, y = normalize_index(x, y)
-    if element_type = 'user'
+    if element_type == 'user'
       if @map[y][x][:type] == element_type && @map[y][x][:user_id] == element_id
         @map[y][x] = nil
       end
-    elsif element_type = 'object'
+    elsif element_type == 'object'
       if @map[y][x][:type] == element_type && @map[y][x][:object_id] == element_id
         @map[y][x] = nil
       end
