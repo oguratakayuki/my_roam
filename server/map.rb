@@ -55,6 +55,7 @@ class Map
     return x < @width && y < @height
   end
   def is_empty_position?(x, y)
+x, y = normalize_index(x, y)
       return @map[y][x] == nil ? true : false
   end
 

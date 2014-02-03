@@ -6,6 +6,11 @@ require 'logger'
 require './user_list.rb'
 require './map.rb'
 
+class Enemy
+  def initialize
+    @type = 1
+  end
+end
 class GameTcpServer
   def initialize
     temp = YAML.load_file('user.yml')
@@ -21,14 +26,16 @@ class GameTcpServer
       message = {'cmd' => 'update_all_user_position', :params => user_list}.to_json
     end
     ip_port_list.each do |ip_port|
-      @logger.error "send_message_to_all_client!!!ip=#{ip_port[:ip]},user_list=#{user_list.to_s}"
-      self.send_only(message, ip_port[:ip])
+      if ip_port[:ip]
+        @logger.error "send_message_to_all_client!!!ip=#{ip_port[:ip]},user_list=#{user_list.to_s}"
+        self.send_only(message, ip_port[:ip])
+      end
     end
   end
   def send_only(message_with_json, ip)
-    s = TCPSocket.open(ip, 10006)
-    s.puts(message_with_json)
-    s.close
+      s = TCPSocket.open(ip, 10006)
+      s.puts(message_with_json)
+      s.close
     return
   end
 
@@ -36,6 +43,7 @@ class GameTcpServer
     # 新しいサーバ接続をポート10001で開く
     server = TCPServer.open(@port=10005)
     # クライアントからの接続を待つ
+    set_enemy
     while true
       # クライアントからの入力を出力(1行のみ)
       Thread.start(server.accept) do |sock|
@@ -56,17 +64,14 @@ class GameTcpServer
         elsif message['cmd'] == 'move'
           @logger.error 'move accepted'
           user = @user_list.find(message['params']['user_id'])
-          @logger.error 'here'
           move_status = @map.move(user.id, user.x, user.y, message['params']['x'], message['params']['y'])
-          @logger.error "here2 move_status = #{move_status.to_s}"
           if move_status
             user.update_position(message['params']['x'], message['params']['y'])
           end
           result = {:move_status => move_status}.to_json
-          @logger.error "move result = #{JSON.parse(result).to_s}"
           sock.puts result
           if move_status
-            send_message_to_all_client('update_all_user_position', @user_list.ips_and_ports, @user_list.positions)
+            send_message_to_all_client('update_all_user_position', @user_list.ips_and_ports, @user_list.infos)
           end
         elsif message['cmd'] == 'get_display_info'
           window_info = Hash.new
@@ -78,6 +83,13 @@ class GameTcpServer
           window_info[:sub_position_y] = 45
           window_info[:sub_width] = 60
           window_info[:sub_height] = 10
+
+          window_info[:side_position_x] = 120
+          window_info[:side_position_y] = 15
+          window_info[:side_width] = 20
+          window_info[:side_height] = 30
+
+
           result = window_info.to_json
           sock.puts result
         elsif message['cmd'] == 'init_user_position'
@@ -91,7 +103,7 @@ class GameTcpServer
           position = position.to_json
           #新規ユーザーにはpositionを返す
           sock.puts position
-          send_message_to_all_client('update_all_user_position', @user_list.ips_and_ports, @user_list.positions)
+          send_message_to_all_client('update_all_user_position', @user_list.ips_and_ports, @user_list.infos)
         else
           @logger.error "else message #{message.to_s}"
           puts message
@@ -101,6 +113,35 @@ class GameTcpServer
         puts 'hrer'
       end
     end
+  end
+  def set_enemy
+      Thread.start do
+        #position決定
+        enemy = Enemy.new
+        enemy_id = @user_list.get_new_user_by_ip(nil, '10004', type='enemy')
+        enemy = @user_list.find(enemy_id)
+        position = @map.find_free_space.sample
+        @map.move(enemy_id, nil, nil, position['x'], position['y'])
+        @user_list.update_by_id(enemy_id, position['x'], position['y'])
+        while true
+          sleep 2
+          key = [:left, :right, :up, :down].sample
+          next_pos = enemy.next_pos_by_key(key)
+          move_status = @map.move(enemy.id, enemy.x, enemy.y, next_pos[:x], next_pos[:y])
+          if move_status
+            enemy.update_position(next_pos[:x], next_pos[:y])
+            send_message_to_all_client('update_all_user_position', @user_list.ips_and_ports, @user_list.infos)
+          end
+        end
+        #position = {'x' => 3, 'y' => 4}
+        #更新
+        #送信
+        #position = position.to_json
+        #新規ユーザーにはpositionを返す
+        #sock.puts position
+      end
+
+
   end
 end
 

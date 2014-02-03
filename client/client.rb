@@ -113,6 +113,7 @@ begin
     if server_queue.empty? == false
       message = server_queue.pop
       if message.instance_of?(Hash) && message['cmd'] == 'update_all_user_position'
+        logger.error "move message #{message['params'].to_s}}"
         display.write(message['params'], chara.get_message)
       else
       end

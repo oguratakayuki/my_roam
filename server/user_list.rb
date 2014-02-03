@@ -1,16 +1,36 @@
 class User
-  attr_reader :id, :ip, :x, :y, :port
-  def initialize(user_id, ip, port)
+  attr_reader :id, :ip, :x, :y, :port, :type, :hp
+  def initialize(user_id, ip, port, type=nil)
     @id = user_id
     @ip = ip
     @port = '10006'
     @x = 0
     @y = 0
+    @type = type
+    @hp = 100
   end
   def update_position(x,y)
     @x = x
     @y = y
   end
+  def next_pos_by_key(key)
+    self.send("#{key.to_s}_pos")
+  end
+  def left_pos
+    {:x => (@x - 1), :y => @y}
+  end
+
+  def right_pos
+    {:x => (@x + 1), :y => @y}
+  end
+
+  def up_pos
+    {:x => @x, :y => (@y - 1)}
+  end
+  def down_pos
+    {:x => @x, :y => (@y + 1)}
+  end
+
 end
 
 class UserList
@@ -20,9 +40,9 @@ class UserList
     @logger = Logger.new('./log/user_list_log.txt')
     @logger.level = Logger::WARN
   end
-  def get_new_user_by_ip(ip, port)
+  def get_new_user_by_ip(ip, port, type=nil)
     @last_user_id = @last_user_id + 1
-    user = User.new(@last_user_id, ip, port)
+    user = User.new(@last_user_id, ip, port, type)
     @user_list << user
     user.id
   end
@@ -39,8 +59,8 @@ class UserList
   def ips_and_ports
     @user_list.map{|user| {:ip => user.ip, :port => user.port}}
   end
-  def positions
-    @user_list.map{|user| {:user_id => user.id, :ip => user.ip, :x => user.x, :y => user.y } }
+  def infos
+    @user_list.map{|user| {:user_id => user.id, :ip => user.ip, :x => user.x, :y => user.y, :type => user.type, :hp => user.hp } }
   end
 end
 
