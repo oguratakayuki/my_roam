@@ -1,9 +1,11 @@
 class Map
   def initialize
-    @width = 60
-    @height = 30
-    @map = Array.new(@height).map{Array.new(@width,nil)}
+    @width = 58
+    @height = 29
+    @map = Array.new((@height+1)).map{Array.new((@width+1),nil)}
     @mutex = Mutex.new
+    @logger = Logger.new('./log/map_log')
+    @logger.level = Logger::WARN
   end
   def find(x,y)
     @map[y][x]
@@ -37,11 +39,14 @@ class Map
     result = false
     @mutex.lock
     begin
-      if is_empty_position?(to_x, to_y)
+      #if is_empty_position?(to_x, to_y)
+      if is_empty_position?(to_x, to_y) && is_exist_position?(to_x, to_y)
+        @logger.error "move ok #{[to_x, to_y].to_s}"
         unset(from_x, from_y, 'user', user_id) if from_x != nil && from_y != nil
         set(to_x, to_y, 'user', user_id)
         result = true
       else
+        @logger.error "move fail #{[to_x, to_y].to_s}"
         result = false
       end
     ensure
@@ -52,10 +57,11 @@ class Map
 
 
   def is_exist_position?(x, y)
-    return x < @width && y < @height
+    #x, y = normalize_index(x, y)
+    ( 0 < x && x < @width ) && ( 0 < y && y < @height ) ? true : false
   end
   def is_empty_position?(x, y)
-x, y = normalize_index(x, y)
+      x, y = normalize_index(x, y)
       return @map[y][x] == nil ? true : false
   end
 

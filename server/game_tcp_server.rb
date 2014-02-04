@@ -6,11 +6,6 @@ require 'logger'
 require './user_list.rb'
 require './map.rb'
 
-class Enemy
-  def initialize
-    @type = 1
-  end
-end
 class GameTcpServer
   def initialize
     temp = YAML.load_file('user.yml')
@@ -33,9 +28,9 @@ class GameTcpServer
     end
   end
   def send_only(message_with_json, ip)
-      s = TCPSocket.open(ip, 10006)
-      s.puts(message_with_json)
-      s.close
+    s = TCPSocket.open(ip, 10006)
+    s.puts(message_with_json)
+    s.close
     return
   end
 
@@ -58,8 +53,8 @@ class GameTcpServer
         if message['cmd'] == 'new_user_id'
           @logger.error 'new_user_id accepted'
           puts "accept from #{remote_ip} ok"
-          user_id = @user_list.get_new_user_by_ip(remote_ip, '10004')
-          result = {:user_id => user_id}.to_json
+          user = @user_list.get_new_user_by_ip(remote_ip, '10004')
+          result = {:user_id => user.id}.to_json
           sock.puts result
         elsif message['cmd'] == 'move'
           @logger.error 'move accepted'
@@ -115,33 +110,30 @@ class GameTcpServer
     end
   end
   def set_enemy
-      Thread.start do
-        #position決定
-        enemy = Enemy.new
-        enemy_id = @user_list.get_new_user_by_ip(nil, '10004', type='enemy')
-        enemy = @user_list.find(enemy_id)
-        position = @map.find_free_space.sample
-        @map.move(enemy_id, nil, nil, position['x'], position['y'])
-        @user_list.update_by_id(enemy_id, position['x'], position['y'])
-        while true
-          sleep 2
-          key = [:left, :right, :up, :down].sample
-          next_pos = enemy.next_pos_by_key(key)
+    Thread.start do
+      #position決定
+      @logger.error "enemy"
+      #enemy = Enemy.new
+      enemy = @user_list.get_new_enemy
+      @logger.error "enemy id #{enemy.id}"
+      position = @map.find_free_space.sample
+      @map.move(enemy.id, nil, nil, position['x'], position['y'])
+      @user_list.update_by_id(enemy.id, position['x'], position['y'])
+      while true
+        sleep 0.5
+        #key = [:left, :right, :up, :down].sample
+        #next_pos = enemy.next_pos_by_key(key)
+        action_info = enemy.next_action
+        if action_info[:type] == 'walk'
+          next_pos = action_info[:params][:next_pos]
           move_status = @map.move(enemy.id, enemy.x, enemy.y, next_pos[:x], next_pos[:y])
           if move_status
             enemy.update_position(next_pos[:x], next_pos[:y])
             send_message_to_all_client('update_all_user_position', @user_list.ips_and_ports, @user_list.infos)
           end
         end
-        #position = {'x' => 3, 'y' => 4}
-        #更新
-        #送信
-        #position = position.to_json
-        #新規ユーザーにはpositionを返す
-        #sock.puts position
       end
-
-
+    end
   end
 end
 

@@ -30,7 +30,27 @@ class User
   def down_pos
     {:x => @x, :y => (@y + 1)}
   end
+end
 
+class Enemy < User
+  attr_reader :id, :x, :y, :type, :hp, :status, :lock_user_id
+  def initialize(enemy_id)
+    @id = enemy_id
+    @x = 0
+    @y = 0
+    @type = 'enemy'
+    @hp = 100
+    @status = 'free'
+    @lock_user_id = nil
+  end
+  def next_action
+    randam_walk
+  end
+  def randam_walk
+    key = [:left, :right, :up, :down].sample
+    next_pos = next_pos_by_key(key)
+    action = {:type => 'walk', :params => {:next_pos => next_pos } }
+  end
 end
 
 class UserList
@@ -44,7 +64,13 @@ class UserList
     @last_user_id = @last_user_id + 1
     user = User.new(@last_user_id, ip, port, type)
     @user_list << user
-    user.id
+    user
+  end
+  def get_new_enemy
+    @last_user_id = @last_user_id + 1
+    enemy = Enemy.new(@last_user_id)
+    @user_list << enemy
+    enemy
   end
   def get_user_by_position(x, y)
     @user_list.detect{|t| t.x == x && t.y == y}
