@@ -1,0 +1,17 @@
+tcp_receive_port: 10005
+tcp_send_port:    10006
+window_info:
+  main_position_x: 50
+  main_position_y: 15
+  main_width: 60
+  main_height: 30
+  sub_position_x: 50
+  sub_position_y: 45
+  sub_width: 60
+  sub_height: 10
+  side_position_x: 120
+  side_position_y: 15
+  side_width: 20
+  side_height: 30
+
+

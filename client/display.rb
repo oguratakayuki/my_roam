@@ -35,6 +35,8 @@ class Display
     write_sub(message_list)
     write_side(message_list)
   end
+  def is_movable?(x,y)
+  end
   def write_main(user_list)
     #[{"user_id"=>1, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}, {"user_id"=>2, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}, {"user_id"=>3, "ip"=>"192.168.12.3", "x"=>2, "y"=>1}]
     Curses.init_screen

@@ -8,10 +8,11 @@ require './map.rb'
 
 class GameTcpServer
   def initialize
-    temp = YAML.load_file('user.yml')
-    @port = temp['accepter_setting']['port']
+    @setting = YAML.load_file('server_setting.yml')
+    @receive_port = @setting['tcp_receive_port']
     @user_list = UserList.new
     @logger = Logger.new('./log/tcp_server_log.txt')
+    @logger2 = Logger.new('./log/enemy_log.txt')
     @logger.level = Logger::WARN
     @map = Map.new
   end
@@ -36,7 +37,7 @@ class GameTcpServer
 
   def start
     # 新しいサーバ接続をポート10001で開く
-    server = TCPServer.open(@port=10005)
+    server = TCPServer.open(@receive_port=10005)
     # クライアントからの接続を待つ
     set_enemy
     while true
@@ -70,20 +71,20 @@ class GameTcpServer
           end
         elsif message['cmd'] == 'get_display_info'
           window_info = Hash.new
-          window_info[:main_position_x] = 50
-          window_info[:main_position_y] = 15
-          window_info[:main_width] = 60
-          window_info[:main_height] = 30
-          window_info[:sub_position_x] = 50
-          window_info[:sub_position_y] = 45
-          window_info[:sub_width] = 60
-          window_info[:sub_height] = 10
+          window_info[:main_position_x] = @setting['window_info']['main_position_x']
+          window_info[:main_position_y] = @setting['window_info']['main_position_y']
+          window_info[:main_width] = @setting['window_info']['main_width']
+          window_info[:main_height] = @setting['window_info']['main_height']
 
-          window_info[:side_position_x] = 120
-          window_info[:side_position_y] = 15
-          window_info[:side_width] = 20
-          window_info[:side_height] = 30
+          window_info[:sub_position_x] = @setting['window_info']['sub_position_x']
+          window_info[:sub_position_y] = @setting['window_info']['sub_position_y']
+          window_info[:sub_width] = @setting['window_info']['sub_width']
+          window_info[:sub_height] = @setting['window_info']['sub_height']
 
+          window_info[:side_position_x] = @setting['window_info']['side_position_x']
+          window_info[:side_position_y] = @setting['window_info']['side_position_y']
+          window_info[:side_width] = @setting['window_info']['side_width']
+          window_info[:side_height] = @setting['window_info']['side_height']
 
           result = window_info.to_json
           sock.puts result
@@ -111,6 +112,8 @@ class GameTcpServer
   end
   def set_enemy
     Thread.start do
+
+
       #position決定
       @logger.error "enemy"
       #enemy = Enemy.new
@@ -121,6 +124,23 @@ class GameTcpServer
       @user_list.update_by_id(enemy.id, position['x'], position['y'])
       while true
         sleep 0.5
+
+Signal.trap(:TSTP) do
+  puts ''
+  puts "SIGTSTOP"
+  puts "SIGTSTOP(ctrl+z)"
+  puts ''
+  @map.dump
+  puts ''
+  enemy.to_s
+  puts ''
+  exit(0)
+end
+
+
+
+
+
         #key = [:left, :right, :up, :down].sample
         #next_pos = enemy.next_pos_by_key(key)
         action_info = enemy.next_action
@@ -128,8 +148,10 @@ class GameTcpServer
           next_pos = action_info[:params][:next_pos]
           move_status = @map.move(enemy.id, enemy.x, enemy.y, next_pos[:x], next_pos[:y])
           if move_status
+            puts "!!!ENEMY MOVE OK x=#{next_pos[:x]},y=#{next_pos[:y]}"
             enemy.update_position(next_pos[:x], next_pos[:y])
             send_message_to_all_client('update_all_user_position', @user_list.ips_and_ports, @user_list.infos)
+            puts "!!ENEMY MOVE SEND END"
           end
         end
       end

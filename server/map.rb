@@ -13,8 +13,10 @@ class Map
   def dump
     @map.each_with_index do |list, y_index|
       list.each_with_index do |pos, x_index|
-        unless is_empty_position?(x_index, y_index)
+        #unless is_empty_position?(x_index, y_index)
+        unless pos.nil?
           print pos[:user_id]
+          #abort 'here'
         else
           print '#'
         end
