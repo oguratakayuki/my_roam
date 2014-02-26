@@ -52,7 +52,7 @@ class Display
       end
     end
     win.refresh
-sleep 0.2
+sleep 0.02
     win.close
   end
   def write_sub(message_list)

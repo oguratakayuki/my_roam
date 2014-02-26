@@ -1,7 +1,7 @@
 class Map
   def initialize
-    @width = 58
-    @height = 29
+    @width = 60
+    @height = 30
     @map = Array.new((@height+1)).map{Array.new((@width+1),nil)}
     @mutex = Mutex.new
     @logger = Logger.new('./log/map_log')
@@ -63,14 +63,14 @@ class Map
     ( 0 < x && x < @width ) && ( 0 < y && y < @height ) ? true : false
   end
   def is_empty_position?(x, y)
-      x, y = normalize_index(x, y)
+      #x, y = normalize_index(x, y)
       return @map[y][x] == nil ? true : false
   end
 
 
   private
   def set(x, y, element_type, element_id)
-    x, y = normalize_index(x, y)
+    #x, y = normalize_index(x, y)
     if is_empty_position?(x, y)
       if element_type == 'user'
         @map[y][x] = {:type => 'user', :user_id => element_id}
@@ -83,7 +83,7 @@ class Map
     end
   end
   def unset(x, y, element_type, element_id)
-    x, y = normalize_index(x, y)
+    #x, y = normalize_index(x, y)
     if element_type == 'user'
       if @map[y][x][:type] == element_type && @map[y][x][:user_id] == element_id
         @map[y][x] = nil

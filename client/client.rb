@@ -2,6 +2,7 @@
 #!/usr/local/bin/ruby
 
 require 'curses'
+require './account_process_action.rb'
 require './game_tcp_client.rb'
 require './display.rb'
 require 'json'
@@ -40,6 +41,29 @@ class MessageLog
     @messages[first..@messages.count]
   end
 end
+
+
+class ClientEvent
+  attr_reader :queue
+  def initialize
+    @queue = nil
+  end
+  def start
+    create_wait_client_event_process
+  end
+  def create_wait_client_event_process
+    @queue = Queue.new
+    Thread.start do
+      stdscr.keypad true
+      while(key = Curses.getch)
+        @queue.push(key)
+      end
+    end
+  end
+end
+
+
+
 
 def create_receive_process
   #q = Queue.new
@@ -80,18 +104,6 @@ def create_receive_process
   end
   server_queue
 end
-
-def create_wait_client_event_process
-  q = Queue.new
-  Thread.start do
-    stdscr.keypad true
-    while(key = Curses.getch)
-      q.push(key)
-    end
-  end
-  return q
-end
-
 begin
   #for test start
 #init_screen
@@ -100,6 +112,13 @@ begin
   logger.level = Logger::WARN
 
   tcp_client = GameTcpClient.new
+  client_event = ClientEvent.new
+  client_event.start
+
+  account_process = AccountProcessAction.new(tcp_client)
+  account_process.set_client_queue(client_event.queue)
+  account_process.start
+
   display = Display.new(tcp_client.get_display_info)
   display.write(user_list=[], message_list=[])
   #display.initialize_view
@@ -107,7 +126,6 @@ begin
   position = tcp_client.init_user_position(user_id)
   logger.error "initial position #{position.to_s}"
   chara = Character.new(user_id, position['x'], position['y'])
-  client_queue = create_wait_client_event_process
   server_queue = create_receive_process
   loop do
     if server_queue.empty? == false
