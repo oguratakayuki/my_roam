@@ -39,7 +39,6 @@ class GameTcpClient
 
 
 
-
   def move(user_id, x, y)
     message = {'cmd' => "move", :params => {:user_id => user_id, :x => x, :y => y}}.to_json
     result = self.send(message)

@@ -1,0 +1,30 @@
+:login_form:
+  :type: :select
+  :positions:
+    :x: 10
+    :y: 10
+    :width: 20
+    :height: 20
+  :elements:
+    - :id: 0
+      :selective: 0
+      :text_colour: red
+      :title: '  new'
+      :selected_title: '->new'
+      :x: 5
+      :y: 5
+
+    - :id: 0
+      :selective: 1
+      :title: '  new'
+      :selected_title: '->new'
+      :x: 5
+      :y: 5
+    - :id: 1
+      :selective: 1
+      :title: '  continue'
+      :selected_title: '->continue'
+      :x: 5
+      :y: 6
+:another_form:
+  :type: :select

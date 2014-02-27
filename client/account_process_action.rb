@@ -1,7 +1,8 @@
 ## -*- coding: utf-8 -*-
 #!/usr/local/bin/ruby
-
 #require './process.rb'
+require 'yaml'
+
 class ProcessAction
   attr_reader :action_results
 end
@@ -11,7 +12,7 @@ class AccountProcessAction < ProcessAction
   CONTINUE = 1
   def initialize(tcp_client)
     @tcp_client = tcp_client
-    @settings = load_settings
+    @settings = YAML.load_file('processes.yml')
     @current_mode = :login_form
     @client_event = nil
     @login_status = 0
@@ -67,24 +68,11 @@ class AccountProcessAction < ProcessAction
     prev_action_name = @actions[@actions.index(action_name) -1]
     @action_results[prev_action_name]
   end
-  def load_settings
-    [
-      {:key => :login_form,
-       :type => :select,
-       :positions => {:x => 10, :y => 10, :width => 20, :height => 20},
-       :elements =>
-         [
-           {:id => 0, :title => '  new', :selected_title => '->new', :x => 5, :y => 5},
-           {:id => 1, :title => '  continue', :selected_title => '->continue', :x => 5, :y => 6}
-         ]
-      }
-    ]
-  end
 
   def display_form(key, option)
     Curses::init_screen
     stdscr.keypad true
-    form_setting = @settings.detect{|t| t[:key] == key}
+    form_setting = @settings[key]
     w,h,x,y = form_setting[:positions].values_at(:width, :height, :x, :y)
     win = Window.new(w,h,x,y)
     win.box(?|, ?-)
