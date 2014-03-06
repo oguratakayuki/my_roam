@@ -2,7 +2,7 @@
 #!/usr/local/bin/ruby
 
 require 'curses'
-require './account_process_action.rb'
+require './account/account_process.rb'
 require './game_tcp_client.rb'
 require './display.rb'
 require 'json'
@@ -115,7 +115,7 @@ begin
   client_event = ClientEvent.new
   client_event.start
 
-  account_process = AccountProcessAction.new(tcp_client)
+  account_process = AccountProcess.new(tcp_client)
   account_process.set_client_queue(client_event.queue)
   account_process.start
 
