@@ -41,13 +41,13 @@ class AccountProcess < BaseProcess
     @client_queue = client_queue
   end
   def start
-    @actions.each do |current_action|
-      if current_action.instance_of?(Array)
+    @actions.each do |current_action_name|
+      if current_action_name.instance_of?(Array)
         #前回のアクションに分岐がある場合
-        prev_action_result = get_prev_action_result(current_action)
-        dispatch_event(current_action[prev_action_result])
+        prev_action_result = get_prev_action_result(current_action_name)
+        dispatch_event(current_action_name[prev_action_result[:next_action_id]])
       else
-        dispatch_event(current_action)
+        dispatch_event(current_action_name)
       end
     end
   end
@@ -59,9 +59,9 @@ class AccountProcess < BaseProcess
       i_action = action.interrupt_next_action_name
       dispatch_event(i_action)
     end
-    abort 'yeah' + action.results.to_s
-    sleep 1
-    Curses::close_screen
+    #abort 'yeah' + action.results.to_s
+    #sleep 1
+    #Curses::close_screen
   end
   def get_info
     {:user_id => 1, :level => 1, :status => {} }

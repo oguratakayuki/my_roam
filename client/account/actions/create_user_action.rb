@@ -3,32 +3,18 @@
 #require './login_form_view.rb'
 require 'yaml'
 
-class BaseAction
-  def has_interrupt_next_action?
-    false
-  end
-  def interrupt_next_action_name
-  end
-  def results
-    @results
-  end
-  def result_by_key(key)
-    @results[key]
-  end
-end
-
-class LoginFormAction < BaseAction
+class CreateUserAction < BaseAction
   attr_reader :name
   def initialize(queue)
-    @name = :login_form
+    @name = :create_user
     @client_queue = queue
     @results = {}
-    @view = LoginFormView.new
+    @view = CreateUserView.new
   end
   def execute
     cursor = 0
     while true
-      @view.display({:form_name => :login, :cursor => cursor})
+      @view.display({:form_name => :create_user, :cursor => cursor})
       sleep 0.2
       unless @client_queue.empty?
         key = @client_queue.deq
