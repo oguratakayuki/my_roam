@@ -14,26 +14,36 @@
       :width: 20
       :height: 20
     :elements:
-      - :id: 0
+      - :id: 1
+        :type: button
         :selective: 0
         :text_colour: red
         :title: '  new'
         :selected_title: '->new'
+        :h: 10
+        :w: 10
         :x: 5
         :y: 5
   
-      - :id: 0
+      - :id: 2
+        :type: button
         :selective: 1
         :title: '  new'
         :selected_title: '->new'
+        :h: 10
+        :w: 10
         :x: 5
-        :y: 5
-      - :id: 1
+        :y: 15
+
+      - :id: 3
+        :type: button
         :selective: 1
         :title: '  continue'
         :selected_title: '->continue'
+        :h: 10
+        :w: 10
         :x: 5
-        :y: 6
+        :y: 25 
   :create_user:
     :type: :input
     :positions:

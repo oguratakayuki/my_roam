@@ -3,6 +3,7 @@
 
 require 'curses'
 require './account/account_process.rb'
+require './lib/dev_log.rb'
 require './game_tcp_client.rb'
 require './display.rb'
 require 'json'

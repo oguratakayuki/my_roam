@@ -37,12 +37,17 @@ class LoginFormAction < BaseAction
           cursor == 0 ? cursor = 1 : cursor = 0
         when Curses::Key::DOWN
           cursor == 0 ? cursor = 1 : cursor = 0
+        when 9 # tab
+          cursor == 0 ? cursor = 1 : cursor = 0
         when 10 #enter key
           @results[:next_action_id] = cursor
           break
         else
-          abort 'unknow key'
-          continue
+          DevLog.get_instance.write "you push #{key.to_s}"
+          @view.key_event(key)
+          #abort 'unknow key'
+          next
+          #continue
         end
       end
     end
