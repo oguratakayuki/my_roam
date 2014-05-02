@@ -3,20 +3,6 @@
 #require './login_form_view.rb'
 require 'yaml'
 
-class BaseAction
-  def has_interrupt_next_action?
-    false
-  end
-  def interrupt_next_action_name
-  end
-  def results
-    @results
-  end
-  def result_by_key(key)
-    @results[key]
-  end
-end
-
 class LoginFormAction < BaseAction
   attr_reader :name
   def initialize(queue)
@@ -24,34 +10,47 @@ class LoginFormAction < BaseAction
     @client_queue = queue
     @results = {}
     @view = LoginFormView.new
+    @action_end = false
   end
   def execute
-    cursor = 0
     while true
-      @view.display({:form_name => :login, :cursor => cursor})
+      event_result = nil
+      return if @action_end
+      @view.display({:form_name => :login})
       sleep 0.2
       unless @client_queue.empty?
         key = @client_queue.deq
         case key
         when Curses::Key::UP
-          cursor == 0 ? cursor = 1 : cursor = 0
+          @view.move_element(:forth)
         when Curses::Key::DOWN
-          cursor == 0 ? cursor = 1 : cursor = 0
+          @view.move_element(:back)
         when 9 # tab
-          cursor == 0 ? cursor = 1 : cursor = 0
+          @view.move_element(:forth)
         when 10 #enter key
-          @results[:next_action_id] = cursor
-          break
+          #@results[:next_action_id] = cursor
+          event_result = @view.key_event(key)
+          #break
+        when ' '
+          event_result = @view.key_event(key)
+          #break
         else
-          DevLog.get_instance.write "you push #{key.to_s}"
-          @view.key_event(key)
+          #DevLog.get_instance.write "you push #{key.to_s}"
+          event_result = @view.key_event(key)
           #abort 'unknow key'
-          next
+          #next
           #continue
+        end
+        if event_result
+          evaluate_event_result(event_result)
         end
       end
     end
-    if @results[:cursor] == 1
+  end
+  def evaluate_event_result(event_result)
+    if event_result.key?(:move_next)
+      @action_end = true
+      @results[:next_action_id] = event_result[:move_next_action_id]
     end
   end
 

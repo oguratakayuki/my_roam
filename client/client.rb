@@ -2,13 +2,15 @@
 #!/usr/local/bin/ruby
 
 require 'curses'
+require 'require_all'
+require_all './lib/view/'
+require_all './lib/action/'
 require './account/account_process.rb'
 require './lib/dev_log.rb'
 require './game_tcp_client.rb'
 require './display.rb'
 require 'json'
 require 'logger'
-
 include Curses
 
 class Character
