@@ -3,7 +3,7 @@
     :x: 10
     :y: 10
     :width: 170
-    :height: 40
+    :height: 60
 
 :forms:
   :login:
@@ -11,17 +11,19 @@
     :positions:
       :x: 10
       :y: 10
-      :width: 50
-      :height: 20
+      :width: 100
+      :height: 50
     :elements:
       - :id: 1
         :type: button
         :attributes:
-          :is_selectable: 0
+          :is_selectable: 1
           :is_clickable: 0
           :selected_title: '->new'
-          :move_next: 1
-          :move_next_action_id: 0
+          :pushed_action_info:
+            :move_next: 1
+            :move_next_action_id: 0
+
         :text_colour: red
         :title: '  new'
         :h: 10
@@ -32,33 +34,76 @@
       - :id: 2
         :type: button
         :attributes:
-          :is_selectable: 0
+          :is_selectable: 1
           :is_clickable: 0
           :selected_title: '->continue'
-          :move_next: 1
-          :move_next_action_id: 1
+          :pushed_action_info:
+            :move_next: 1
+            :move_next_action_id: 1
         :title: '  continue'
         :h: 10
         :w: 20
         :x: 5
-        :y: 25 
+        :y: 15 
 
   :create_user:
     :type: :input
     :positions:
       :x: 10
-      :y: 40
-      :width: 50
+      :y: 10
+      :width: 100
       :height: 50
     :elements:
       - :id: 0
         :type: :input
-        :is_selectable: 0
-        :text_colour: red
-        :title: '  user_name'
-        :selected_title: '->user_name'
-        :x: 15
+        :title: 'ID'
+        :attributes:
+          :is_selectable: 1
+          :is_clickable: 0
+          :selected_title: '->ID'
+          :text_colour: red
+        :h: 15
+        :w: 20
+        :x: 5
+        :y: 5
+      - :id: 1
+        :type: :input
+        :title: '  PASS'
+        :attributes:
+          :is_selectable: 1
+          :is_clickable: 0
+          :selected_title: '->PASS'
+          :text_colour: red
+        :h: 15
+        :w: 20
+        :x: 5
+        :y: 15
+      - :id: 2 
+        :type: button
+        :title: '  submit'
+        :h: 10
+        :w: 20
+        :x: 5
         :y: 25
-        :width: 15
+        :attributes:
+          :is_selectable: 1
+          :is_clickable: 0
+          :selected_title: '->submit<-'
+          :pushed_action_info:
+            :move_next: 1
+            :move_next_action_id: 1
+      - :id: 3 
+        :type: :test
+        :title: 'test'
+        :h: 10 
+        :w: 20
+        :x: 5
+        :y: 30
+        :attributes:
+          :is_test: 1
+          :is_selectable: 0
+          :is_clickable: 0
+          :selected_title: '->ID'
+          :text_colour: red
   
   

@@ -1,10 +1,10 @@
+## -*- coding: utf-8 -*-
 class BaseView
   def initialize
-    @main_setting = YAML.load_file('account/actions/settings.yml')[:main_frame]
-    @forms_setting = YAML.load_file('account/actions/settings.yml')[:forms]
+    load_setting
     @logger = Logger.new('./log/base_view_log')
     @logger.level = Logger::WARN
-    @elements = []
+    @elements = nil
     @selected_element_id = 1
     @max_element_id = 0
     set_form_name
@@ -13,6 +13,10 @@ class BaseView
     #  @logger.warn element.to_s
     #end
   end
+  def debugger_action
+    @elements.debugger_action
+  end
+
   def setup_form
   end
   def create_elements
@@ -50,19 +54,6 @@ class BaseView
     win = Window.new(h,w,x,y)
     win.box(?|, ?-)
     win.refresh
-  end
-  def write_input_element(h, w, x, y, write_str, win)
-    win.setpos(y, x)
-    up_down_str = '-'*w
-    win.addstr(up_down_str)
-    win.setpos(y+1, x)
-    win.addstr('|')
-    win.setpos(y+1, x+2)
-    win.addstr(write_str)
-    win.setpos(y+1, x+w)
-    win.addstr('|')
-    win.setpos(y+2, x)
-    win.addstr(up_down_str)
   end
 end
 

@@ -3,6 +3,7 @@
 
 require 'curses'
 require 'require_all'
+require './lib/base_process.rb'
 require_all './lib/view/'
 require_all './lib/action/'
 require './account/account_process.rb'

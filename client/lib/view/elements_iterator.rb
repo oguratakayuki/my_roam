@@ -15,11 +15,17 @@ class ElementsIterator
   end
   def all(option=nil)
     if option
-      @elements.delete_if{|t| t.attributes[option] == true }
+      @elements.select{|t| t.attributes.key?(option) && t.attributes[option] }
     else
       @elements
     end
   end
+  def debugger_action
+    str = "ce=#{@current_element_id.to_s}/ec=#{@element_counts.to_s}"
+    all(:is_test).first.text_set(str)
+  end
+
+
   def key_event(key)
     current.key_event(key)
   end
@@ -34,13 +40,15 @@ class ElementsIterator
     else
       __send__("move_#{direction}_one")
     end
-    all.each{|t| t.selected_toggle}
+    all.each{|t| t.set_selected(false)}
+    current.set_selected(true)
   end
   def move_by_attribute(direction, option)
-    if @elements.index{|t| t.__send__(option.to_s) == true}
+    #if @elements.index{|t| t.__send__(option.to_s) == true}
+    if @elements.index{|t| t.attributes[option] == 1}
       while true do
         __send__("move_#{direction}_one")
-        break if current.__send__(option.to_s) == true
+        break if current.attributes[option] == 1 
       end
     end
   end
