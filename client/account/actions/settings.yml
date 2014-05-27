@@ -20,9 +20,10 @@
           :is_selectable: 1
           :is_clickable: 0
           :selected_title: '->new'
-          :pushed_action_info:
+          :action_end_info:
             :move_next: 1
             :move_next_action_id: 0
+          :object_name: 'signup_button'
 
         :text_colour: red
         :title: '  new'
@@ -37,9 +38,10 @@
           :is_selectable: 1
           :is_clickable: 0
           :selected_title: '->continue'
-          :pushed_action_info:
+          :action_end_info:
             :move_next: 1
             :move_next_action_id: 1
+          :object_name: 'signin_button'
         :title: '  continue'
         :h: 10
         :w: 20
@@ -56,12 +58,13 @@
     :elements:
       - :id: 0
         :type: :input
-        :title: 'ID'
+        :title: 'user name'
         :attributes:
           :is_selectable: 1
           :is_clickable: 0
-          :selected_title: '->ID'
+          :selected_title: '->user name'
           :text_colour: red
+          :object_name: 'user_name'
         :h: 15
         :w: 20
         :x: 5
@@ -74,6 +77,7 @@
           :is_clickable: 0
           :selected_title: '->PASS'
           :text_colour: red
+          :object_name: 'password'
         :h: 15
         :w: 20
         :x: 5
@@ -89,9 +93,10 @@
           :is_selectable: 1
           :is_clickable: 0
           :selected_title: '->submit<-'
-          :pushed_action_info:
+          :action_end_info:
             :move_next: 1
             :move_next_action_id: 1
+          :object_name: 'submit_button'
       - :id: 3 
         :type: :test
         :title: 'test'
@@ -105,5 +110,6 @@
           :is_clickable: 0
           :selected_title: '->ID'
           :text_colour: red
+          :object_name: 'test_text'
   
   

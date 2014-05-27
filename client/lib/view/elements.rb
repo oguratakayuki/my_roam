@@ -1,7 +1,7 @@
 ## -*- coding: utf-8 -*-
 #!/usr/local/bin/ruby
 class BaseElement
-  attr_accessor :attributes, :element_id
+  attr_accessor :attributes, :element_id, :object_key, :object_value
   def to_s
     "element_id:#{@element_id}, h:#{@h},w:#{@w},x:#{@x},y:#{@y},type:#{self.class.to_s},title:#{@title}"
   end
@@ -12,14 +12,22 @@ class BaseElement
   end
   def create_push_button_info
     {
-      :element_id => @element_id,
-      :title => @title,
-      :action_info => @attributes[:pushed_action_info],
+      :pushed_element_id => @element_id,
+      :pushed_element_title => @title,
+      :pushed_element_action_end_info => @attributes[:action_end_info],
     }
   end
 
   def set_selected(bool)
     @selected = bool
+  end
+  def element_key
+    #@attributes[:object_name].to_sym if @attributes.key?(:object_name)
+    @attributes[:object_name].to_sym
+  end
+  def element_value
+    #@object_value if defined?(@object_value)
+    @object_value
   end
 end
 
@@ -28,6 +36,7 @@ class TestElement < BaseElement
     @element_id, @h, @w, @x, @y, @title, @attributes =  element_id, h, w, x, y, title, attributes
     @selected = false
     @text = ''
+    @object_value = nil
   end
   def draw(win)
     win.setpos(@y, @x)
@@ -53,7 +62,7 @@ class InputElement < BaseElement
   def initialize(element_id, h, w, x, y, title, attributes)
     @element_id, @h, @w, @x, @y, @title, @attributes =  element_id, h, w, x, y, title, attributes
     @selected = false
-    @user_input = ''
+    @object_value = ''
   end
   def draw(win)
     win.setpos(@y, @x)
@@ -65,13 +74,10 @@ class InputElement < BaseElement
     win.addstr(@selected ? @attributes[:selected_title] : @title)
 
     win.setpos(@y+2, @x+2)
-    win.addstr(@user_input)
-
-
+    win.addstr(@object_value)
 
     win.setpos(@y+3, @x+@w)
     win.addstr('|')
-
 
     win.setpos(@y+4, @x)
     win.addstr(@up_down_str)
@@ -79,11 +85,11 @@ class InputElement < BaseElement
   def key_event(key)
     #if key == '127'
     if key == 263
-      temp = @user_input.split('')
+      temp = @object_value.split('')
       temp.pop
-      @user_input = temp.join
+      @object_value = temp.join
     else
-      @user_input << key.to_s
+      @object_value << key.to_s
     end
     nil
   end
@@ -95,6 +101,7 @@ class ButtonElement < BaseElement
     @element_id, @h, @w, @x, @y, @title, @attributes =  element_id, h, w, x, y, title, attributes
     @text = ''
     @selected = false
+    @object_value = nil
   end
   def draw(win)
     @text = @selected ? @attributes[:selected_title] : @title

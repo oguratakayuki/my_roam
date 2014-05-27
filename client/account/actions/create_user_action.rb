@@ -11,6 +11,8 @@ class CreateUserAction < BaseAction
     @results = {}
     @view = CreateUserView.new
     @action_end = false
+    @logger = Logger.new('./log/create_user_log')
+    @logger.level = Logger::WARN
   end
   def execute
     while true
@@ -33,11 +35,18 @@ class CreateUserAction < BaseAction
     end
   end
   def evaluate_event_result(event_result)
-    if event_result[:action_info].key?(:move_next)
+    if event_result[:pushed_element_action_end_info].key?(:move_next)
+      if @tcp_client.check_user_name(event_result[:user_name])
+        user_id = @tcp_client.user_registration(event_result[:user_name], event_result[:password])
+      else
+
+      end
+      @logger.error "!!!!!!!!!!return=#{ret.to_s}"
       @action_end = true
       @results[:login_type] = :new
       @results[:user_name] = event_result[:user_name]
       @results[:password] = event_result[:password]
+      @logger.error "!!!!!!!!!!return=#{@results.to_s}"
     end
   end
 

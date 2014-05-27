@@ -28,9 +28,9 @@ class LoginFormAction < BaseAction
     end
   end
   def evaluate_event_result(event_result)
-    if event_result[:action_info].key?(:move_next)
+    if event_result[:pushed_element_action_end_info].key?(:move_next)
       @action_end = true
-      @results[:next_action_id] = event_result[:action_info][:move_next_action_id]
+      @results[:next_action_id] = event_result[:pushed_element_action_end_info][:move_next_action_id]
     end
   end
 

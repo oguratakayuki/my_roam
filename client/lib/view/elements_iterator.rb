@@ -12,6 +12,11 @@ class ElementsIterator
     @current_element_id = 0
     @element_counts = @elements.count
     all(:is_selectable).first.set_selected(true)
+
+
+    @logger = Logger.new('./log/element_iterator_log')
+    @logger.level = Logger::WARN
+
   end
   def all(option=nil)
     if option
@@ -27,7 +32,18 @@ class ElementsIterator
 
 
   def key_event(key)
-    current.key_event(key)
+    result = current.key_event(key)
+    #使って無かった。base_viewでやっている
+    if result.is_a?(Hash) && result.key?(:action_info)
+      #終わり
+      all.each do |t|
+        result[t.element_key] = t.element_value if t.element_key
+      end
+      result
+    else
+      nil
+    end
+
   end
   def current
     @elements[@current_element_id]

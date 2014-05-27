@@ -22,6 +22,7 @@ class GameTcpClient
     return result
   end
 
+
   def get_display_info
     message = {'cmd' => "get_display_info"}.to_json
     result = self.send(message)
@@ -37,7 +38,22 @@ class GameTcpClient
     return result
   end
 
+  def check_user_name(user_name)
+    message = {'cmd' => "check_user_name", 'params' => {'user_name' => user_name} }.to_json
+    result = self.send(message)
+    result = JSON.parse(result)
+    return result
+  end
 
+  def user_registration(user_name, password)
+    message = {'cmd' => "create_user", 'params' => {'user_name' => user_name, 'password' => password} }.to_json
+    result = self.send(message)
+    result = JSON.parse(result)
+    unless result.to_i > 1
+      raise StanderdError, 'fail to create user'
+    end
+    return result
+  end
 
   def move(user_id, x, y)
     message = {'cmd' => "move", :params => {:user_id => user_id, :x => x, :y => y}}.to_json

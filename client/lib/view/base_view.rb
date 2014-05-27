@@ -30,7 +30,19 @@ class BaseView
     @elements.move(direction, option)
   end
   def key_event(key)
-    current_element.key_event(key)
+    #result = current_element.key_event(key)
+    result = @elements.current.key_event(key)
+    if result.is_a?(Hash) && result.key?(:pushed_element_action_end_info)
+      #終わり
+      @elements.all.each do |t|
+        result[t.element_key] = t.element_value if t.element_key
+      end
+      result
+    else
+      nil
+    end
+
+
   end
 
   def display(option)
