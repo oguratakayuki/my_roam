@@ -100,19 +100,35 @@ class GameTcpServer
           #新規ユーザーにはpositionを返す
           sock.puts position
           send_message_to_all_client('update_all_user_position', @user_list.ips_and_ports, @user_list.infos)
+        elsif message.key?('cmd')
+          puts "accept method is " + message['cmd']
+          if self.methods.include?(message['cmd'].to_sym)
+            result = send(message['cmd'].to_sym, message['params'])
+            puts "method is over , result = #{result.to_s}"
+            puts message['params'].keys.methods.to_s
+            if message['params'].keys.include?('need_return')
+              puts 'SUCCESS'
+              result = {:result => result.to_s}.to_json
+              sock.puts result
+            else
+              puts 'no return'
+            end
+          else
+            puts 'method is not defined'
+          end
         else
           @logger.error "else message #{message.to_s}"
           puts message
-          puts 'unknown'
         end
         sock.close
-        puts 'hrer'
       end
     end
   end
+  def check_user_name(params)
+    @user_list.check_user_name(params['user_name'])
+  end
   def set_enemy
     Thread.start do
-
 
       #position決定
       @logger.error "enemy"
@@ -125,21 +141,17 @@ class GameTcpServer
       while true
         sleep 0.5
 
-Signal.trap(:TSTP) do
-  puts ''
-  puts "SIGTSTOP"
-  puts "SIGTSTOP(ctrl+z)"
-  puts ''
-  @map.dump
-  puts ''
-  enemy.to_s
-  puts ''
-  exit(0)
-end
-
-
-
-
+        Signal.trap(:TSTP) do
+          puts ''
+          puts "SIGTSTOP"
+          puts "SIGTSTOP(ctrl+z)"
+          puts ''
+          @map.dump
+          puts ''
+          enemy.to_s
+          puts ''
+          exit(0)
+        end
 
         #key = [:left, :right, :up, :down].sample
         #next_pos = enemy.next_pos_by_key(key)

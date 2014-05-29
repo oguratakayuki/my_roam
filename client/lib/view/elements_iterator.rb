@@ -37,7 +37,7 @@ class ElementsIterator
     if result.is_a?(Hash) && result.key?(:action_info)
       #終わり
       all.each do |t|
-        result[t.element_key] = t.element_value if t.element_key
+        result[t.key] = t.value if t.key
       end
       result
     else
@@ -64,7 +64,7 @@ class ElementsIterator
     if @elements.index{|t| t.attributes[option] == 1}
       while true do
         __send__("move_#{direction}_one")
-        break if current.attributes[option] == 1 
+        break if current.attributes[option] == 1
       end
     end
   end

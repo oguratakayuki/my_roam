@@ -1,6 +1,22 @@
 ## -*- coding: utf-8 -*-
 #!/usr/local/bin/ruby
 
+
+class Object
+  def to_b
+    compare_value = self.class == String ? self.downcase : self
+    case compare_value
+      when "yes", "true", "ok", true, "1", 1, :true, :ok, :yes
+        true
+      else
+        false
+    end
+  end
+end
+
+
+
+
 require 'curses'
 require 'require_all'
 require './lib/base_process.rb'

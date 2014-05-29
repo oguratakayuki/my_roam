@@ -1,5 +1,6 @@
 ## -*- coding: utf-8 -*-
 class BaseView
+  #attr_accessor :submit_button
   def initialize
     load_setting
     @logger = Logger.new('./log/base_view_log')
@@ -12,6 +13,7 @@ class BaseView
     #@elements.each do |element|
     #  @logger.warn element.to_s
     #end
+    #@submit_button = nil
   end
   def debugger_action
     @elements.debugger_action
@@ -32,24 +34,41 @@ class BaseView
   def key_event(key)
     #result = current_element.key_event(key)
     result = @elements.current.key_event(key)
-    if result.is_a?(Hash) && result.key?(:pushed_element_action_end_info)
-      #終わり
-      @elements.all.each do |t|
-        result[t.element_key] = t.element_value if t.element_key
-      end
-      result
-    else
-      nil
-    end
-
-
+    #if @elements.current.is_a?(ButtonElement)
+    #  @submit_button = @elements.current.value
+    #end
+    #if result.is_a?(Hash) && result.key?(:pushed_element_action_end_info)
+    #  #終わり
+    #  @elements.all.each do |t|
+    #    result[t.element_key] = t.element_value if t.element_key
+    #  end
+    #  result
+    #else
+    #  nil
+    #end
   end
 
-  def display(option)
+  def elements_info
+    result = {}
+    @elements.all.each do |t|
+      result[t.key] = t.value if t.key
+      @logger.error "key =" + t.key.to_s
+      @logger.error "value =" + t.value.to_s
+    end
+    result
+  end
+
+  def is_end?
+    @elements.all.detect{|t| t.instance_variable_defined?(:@end_call) && t.end_call }
+    #key eventを受け取った後実行
+    #base_viewがsend_eventでelementにkey_eventを送った後で実行される
+  end
+
+  def display
     Curses::init_screen
     stdscr.keypad true
     display_main
-    form_setting = @forms_setting[option[:form_name]]
+    form_setting = @forms_setting[@form_name]
     h,w,x,y = form_setting[:positions].values_at(:height, :width, :x, :y)
     win = Window.new(h,w,x,y)
     win.box(?|, ?-)

@@ -1,6 +1,6 @@
 class User
   attr_reader :id, :ip, :x, :y, :port, :type, :hp
-  def initialize(user_id, ip, port, type=nil)
+  def initialize(user_id, ip, port, type=nil, user_name=nil,password=nil)
     @id = user_id
     @ip = ip
     @port = '10006'
@@ -8,6 +8,8 @@ class User
     @y = 0
     @type = type
     @hp = 100
+    @user_name = user_name
+    @password = password
   end
   def update_position(x,y)
     @x = x
@@ -60,9 +62,9 @@ class UserList
     @logger = Logger.new('./log/user_list_log.txt')
     @logger.level = Logger::WARN
   end
-  def get_new_user_by_ip(ip, port, type=nil)
+  def get_new_user_by_ip(ip, port, type=nil, user_name=nil,password=nil)
     @last_user_id = @last_user_id + 1
-    user = User.new(@last_user_id, ip, port, type)
+    user = User.new(@last_user_id, ip, port, type, user_name, password)
     @user_list << user
     user
   end
@@ -87,6 +89,11 @@ class UserList
   end
   def infos
     @user_list.map{|user| {:user_id => user.id, :ip => user.ip, :x => user.x, :y => user.y, :type => user.type, :hp => user.hp } }
+  end
+  def check_user_name(user_name)
+    puts 'CALLED check_user_name'
+    puts "user_list count is #{@user_list.count.to_s}"
+    @user_list.detect{|t| t.class == 'User' && t.user_name == user_name } ? false : true
   end
 end
 

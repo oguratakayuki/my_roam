@@ -6,10 +6,11 @@ require 'json'
 require 'logger'
 
 class GameTcpClient
+  class TokenParamsInvalid < StandardError;end
   def initialize
-    @ip = '192.168.12.25'
+    @ip = '192.168.12.161'
     @port = '10004'
-    @server_ip = '192.168.12.25'
+    @server_ip = '192.168.12.161'
     @server_port = '10005'
     @logger = Logger.new('./log/tcp_client_log')
     @logger.level = Logger::WARN
@@ -39,18 +40,18 @@ class GameTcpClient
   end
 
   def check_user_name(user_name)
-    message = {'cmd' => "check_user_name", 'params' => {'user_name' => user_name} }.to_json
+    message = {'cmd' => "check_user_name", 'params' => {'user_name' => user_name, 'need_return' => true} }.to_json
     result = self.send(message)
     result = JSON.parse(result)
-    return result
+    return result['result'].to_b
   end
 
   def user_registration(user_name, password)
-    message = {'cmd' => "create_user", 'params' => {'user_name' => user_name, 'password' => password} }.to_json
+    message = {'cmd' => "create_user", 'params' => {'user_name' => user_name, 'password' => password, 'need_return' => true} }.to_json
     result = self.send(message)
     result = JSON.parse(result)
     unless result.to_i > 1
-      raise StanderdError, 'fail to create user'
+      raise StandardError, 'fail to create user'
     end
     return result
   end
