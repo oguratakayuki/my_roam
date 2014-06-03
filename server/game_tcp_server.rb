@@ -17,14 +17,16 @@ class GameTcpServer
     @map = Map.new
   end
 
-  def send_message_to_all_client(cmd, ip_port_list, user_list)
+  def send_message_to_all_client(cmd, ips, user_list)
     if cmd == 'update_all_user_position'
       message = {'cmd' => 'update_all_user_position', :params => user_list}.to_json
     end
-    ip_port_list.each do |ip_port|
-      if ip_port[:ip]
-        @logger.error "send_message_to_all_client!!!ip=#{ip_port[:ip]},user_list=#{user_list.to_s}"
-        self.send_only(message, ip_port[:ip])
+    if ips
+      ips.each do |ip|
+        if ip[:ip]
+          @logger.error "send_message_to_all_client!!!ip=#{ip[:ip]},user_list=#{user_list.to_s}"
+          self.send_only(message, ip[:ip])
+        end
       end
     end
   end
@@ -67,7 +69,7 @@ class GameTcpServer
           result = {:move_status => move_status}.to_json
           sock.puts result
           if move_status
-            send_message_to_all_client('update_all_user_position', @user_list.ips_and_ports, @user_list.infos)
+            send_message_to_all_client('update_all_user_position', @user_list.ips, @user_list.infos)
           end
         elsif message['cmd'] == 'get_display_info'
           window_info = Hash.new
@@ -99,16 +101,15 @@ class GameTcpServer
           position = position.to_json
           #新規ユーザーにはpositionを返す
           sock.puts position
-          send_message_to_all_client('update_all_user_position', @user_list.ips_and_ports, @user_list.infos)
+          send_message_to_all_client('update_all_user_position', @user_list.ips, @user_list.infos)
         elsif message.key?('cmd')
           puts "accept method is " + message['cmd']
           if self.methods.include?(message['cmd'].to_sym)
-            result = send(message['cmd'].to_sym, message['params'])
+            result = send(message['cmd'].to_sym, message['params'], remote_ip)
             puts "method is over , result = #{result.to_s}"
             puts message['params'].keys.methods.to_s
             if message['params'].keys.include?('need_return')
-              puts 'SUCCESS'
-              result = {:result => result.to_s}.to_json
+              puts "now try to return result #{result.to_s}"
               sock.puts result
             else
               puts 'no return'
@@ -124,9 +125,27 @@ class GameTcpServer
       end
     end
   end
-  def check_user_name(params)
-    @user_list.check_user_name(params['user_name'])
+  def check_user_name(params, remote_ip)
+    ret = @user_list.check_user_name(params['user_name'])
+    ret = {:result => ret.to_s}.to_json
+    #ret
   end
+  def user_registration(params, remote_ip)
+    user_id = @user_list.user_registration(params['user_name'], params['password'], remote_ip)
+    ret = {:result => {:user_id => user_id.to_s}}.to_json
+    #ret
+  end
+  def user_update(params, remote_ip)
+    user = @user_list.user_update(params['user_id'], params['attributes'])
+    #ret
+  end
+  def user_login(params, remote_ip)
+    user = @user_list.user_login(params['user_id'])
+puts 'USER LOGIN IS CALLED params =' + params.to_s
+  end
+
+
+
   def set_enemy
     Thread.start do
 
@@ -140,8 +159,8 @@ class GameTcpServer
       @user_list.update_by_id(enemy.id, position['x'], position['y'])
       while true
         sleep 0.5
-
         Signal.trap(:TSTP) do
+          puts "敵など見せます"
           puts ''
           puts "SIGTSTOP"
           puts "SIGTSTOP(ctrl+z)"
@@ -150,7 +169,9 @@ class GameTcpServer
           puts ''
           enemy.to_s
           puts ''
-          exit(0)
+          puts ''
+          puts "enemy pos x = #{enemy.x}, y = #{enemy.y}"
+          #exit(0)
         end
 
         #key = [:left, :right, :up, :down].sample
@@ -162,7 +183,7 @@ class GameTcpServer
           if move_status
             puts "!!!ENEMY MOVE OK x=#{next_pos[:x]},y=#{next_pos[:y]}"
             enemy.update_position(next_pos[:x], next_pos[:y])
-            send_message_to_all_client('update_all_user_position', @user_list.ips_and_ports, @user_list.infos)
+            send_message_to_all_client('update_all_user_position', @user_list.ips, @user_list.infos)
             puts "!!ENEMY MOVE SEND END"
           end
         end

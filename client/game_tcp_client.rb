@@ -43,18 +43,31 @@ class GameTcpClient
     message = {'cmd' => "check_user_name", 'params' => {'user_name' => user_name, 'need_return' => true} }.to_json
     result = self.send(message)
     result = JSON.parse(result)
+    @logger.error "check_user_name return=#{result.to_s}"
     return result['result'].to_b
   end
 
   def user_registration(user_name, password)
-    message = {'cmd' => "create_user", 'params' => {'user_name' => user_name, 'password' => password, 'need_return' => true} }.to_json
+    message = {'cmd' => "user_registration", 'params' => {'user_name' => user_name, 'password' => password, 'need_return' => true} }.to_json
     result = self.send(message)
     result = JSON.parse(result)
-    unless result.to_i > 1
-      raise StandardError, 'fail to create user'
-    end
-    return result
+    user_id = result['result']['user_id'].to_i
+    #unless result.to_i > 1
+    #  raise StandardError, 'fail to create user'
+    #end
+    return user_id
   end
+
+  def user_update(user_id, attributes)
+    message = {'cmd' => "user_update", 'params' => {'user_id' => user_id, 'attributes' => attributes} }.to_json
+    self.send_only(message)
+  end
+
+  def user_login(user_id)
+    message = {'cmd' => "user_login", 'params' => {'user_id' => user_id} }.to_json
+    self.send_only(message)
+  end
+
 
   def move(user_id, x, y)
     message = {'cmd' => "move", :params => {:user_id => user_id, :x => x, :y => y}}.to_json

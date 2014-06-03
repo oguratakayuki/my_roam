@@ -20,6 +20,8 @@ end
 require 'curses'
 require 'require_all'
 require './lib/base_process.rb'
+require './lib/utils.rb'
+require './lib/job.rb'
 require_all './lib/view/'
 require_all './lib/action/'
 require './account/account_process.rb'
@@ -139,24 +141,48 @@ begin
   account_process.set_client_queue(client_event.queue)
   account_process.start
 
+  user_id = Utils::r_find(account_process.action_results, :user_id)
+  user_name = Utils::r_find(account_process.action_results, :user_name)
+  password = Utils::r_find(account_process.action_results, :password)
+  job_id = Utils::r_find(account_process.action_results, :job_id)
+  logger.error "#{account_process.action_results.to_s}"
+  logger.error "user_id =#{user_id}, user_name = #{user_name}, password => #{password}, job_id => #{job_id}"
+
+  #abort
+  #game_process = GameProcess.new(tcp_client)
+  #game_process.set_client_queue(client_event.queue)
+  #game_process.start
+
+
+
+
+
   display = Display.new(tcp_client.get_display_info)
-  display.write(user_list=[], message_list=[])
-  #display.initialize_view
-  user_id = tcp_client.get_new_user_id
-  position = tcp_client.init_user_position(user_id)
-  logger.error "initial position #{position.to_s}"
-  chara = Character.new(user_id, position['x'], position['y'])
+  display.write(user_list=[], message_list=[], sub_message_list=[])
+#display.initialize_view
+
+  #user_id = tcp_client.get_new_user_id
+
   server_queue = create_receive_process
+  tcp_client.user_login(user_id)
+  position = tcp_client.init_user_position(user_id)
+  chara = Character.new(user_id, position['x'], position['y'])
+  logger.error "initial position #{position.to_s}"
+
+
+sub_message_list = ["user_id:#{user_id}", "job:#{Job::JobList[1]}", "user_name:#{user_name}","LEVEL:1","HP:100","STRENGTH:10","MP:20"]
+
+
   loop do
     if server_queue.empty? == false
       message = server_queue.pop
       if message.instance_of?(Hash) && message['cmd'] == 'update_all_user_position'
         logger.error "move message #{message['params'].to_s}}"
-        display.write(message['params'], chara.get_message)
+        display.write(message['params'], chara.get_message, sub_message_list)
       else
       end
-    elsif client_queue.empty? == false
-      key = client_queue.pop
+    elsif client_event.queue.empty? == false
+      key = client_event.queue.pop
       case key
       when Curses::Key::RIGHT
         tcp_client.move(user_id, chara.x + 1 , chara.y) and chara.move(1,0)

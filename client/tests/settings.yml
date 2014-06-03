@@ -135,31 +135,13 @@
           :is_clickable: 0
           :selected_title: '->select job'
           :text_colour: red
-          :key: 'job_id'
+          :key: 'job'
           :value: ''
           :buttons: 
             :warrior: 1
             :wizard: 2
             :ninja: 3
-        :h: 15
-        :w: 40
-        :x: 5
-        :y: 5
-
-      - :id: 1
-        :type: button
-        :title: 'ok'
-        :attributes:
-          :is_selectable: 1
-          :is_clickable: 0
-          :selected_title: '->ok<-'
-          #:key: 'button'
-        :h: 15
-        :w: 20
-        :x: 5
-        :y: 15
-
-
+ 
 
 
 

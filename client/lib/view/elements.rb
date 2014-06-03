@@ -10,19 +10,11 @@ class BaseElement
     #puts "you push #{key}"
     create_push_button_info if [' ',10].include?(key)
   end
-  def create_push_button_info
-    {
-      :pushed_element_id => @element_id,
-      :pushed_element_title => @title,
-      :pushed_element_action_end_info => @attributes[:action_end_info],
-    }
-  end
-
   def set_selected(bool)
     @selected = bool
   end
   def key
-    @attributes[:key].to_sym
+    @attributes[:key].to_sym if @attributes.key?(:key)
   end
 
 end
@@ -45,7 +37,7 @@ class TestElement < BaseElement
     win.setpos(@y+1, @x+@w)
     win.addstr('|')
     win.setpos(@y+2, @x)
-    win.addstr(@up_down_str)
+    win.addstr(up_down_str)
   end
   def text_set(str)
     @text = str
@@ -81,15 +73,20 @@ class InputElement < BaseElement
     win.addstr('|')
     win.setpos(@y+1, @x+2)
     win.addstr(@selected ? @attributes[:selected_title] : @title)
-
+    win.setpos(@y+1, @x+@w)
+    win.addstr('|')
+    win.setpos(@y+2, @x)
+    win.addstr('|')
     win.setpos(@y+2, @x+2)
     win.addstr(@value)
-
+    win.setpos(@y+2, @x+@w)
+    win.addstr('|')
+    win.setpos(@y+3, @x)
+    win.addstr('|')
     win.setpos(@y+3, @x+@w)
     win.addstr('|')
-
     win.setpos(@y+4, @x)
-    win.addstr(@up_down_str)
+    win.addstr(up_down_str)
   end
   def key_event(key)
     #if key == '127'
@@ -125,14 +122,77 @@ class ButtonElement < BaseElement
     win.setpos(@y+1, @x+@w)
     win.addstr('|')
     win.setpos(@y+2, @x)
-    win.addstr(@up_down_str)
+    win.addstr(up_down_str)
   end
   def key_event(key)
     if [" ",10].include?(key)
-      #create_push_button_info
       @value = true
       @end_call = true
     end
+  end
+end
+
+class RadioElement < BaseElement
+  attr_accessor :attributes, :element_id, :value, :end_call, :buttons
+  def initialize(element_id, h, w, x, y, title, attributes)
+    @element_id, @h, @w, @x, @y, @title, @attributes =  element_id, h, w, x, y, title, attributes
+    @text = ''
+    @selected = false
+    @end_call = false
+    @buttons = {}
+    setup_buttons
+    @value = selected_button
+  end
+  def setup_buttons
+    @attributes[:buttons].each do |button|
+      @buttons[button.first] = button[1]
+    end
+    @cursor = @buttons.to_a.dup
+  end
+  def selected_button
+    @buttons[@cursor.first.first]
+  end
+  def next_button
+    @cursor.rotate!(1)
+  end
+  def back_button
+    @cursor.rotate!(-1)
+  end
+
+  def draw(win)
+    @text = @selected ? @attributes[:selected_title] : @title
+    win.setpos(@y, @x)
+    up_down_str = '-'*@w
+    win.addstr(up_down_str)
+    win.setpos(@y+1, @x)
+    win.addstr('|')
+    win.setpos(@y+1, @x+2)
+    win.addstr(@text)
+    win.setpos(@y+1, @x+@w)
+    win.addstr('|')
+    win.setpos(@y+2, @x)
+    win.addstr('|')
+    win.setpos(@y+2, @x+1)
+
+    @buttons.each do |k,v|
+      if v == selected_button
+        win.addstr("[x] #{k}  ")
+      else
+        win.addstr("[ ] #{k}  ")
+      end
+    end
+    win.setpos(@y+2, @x+@w)
+    win.addstr('|')
+    win.setpos(@y+3, @x)
+    win.addstr(up_down_str)
+  end
+  def key_event(key)
+    if Curses::Key::RIGHT == key
+      next_button
+    else Curses::Key::LEFT == key
+      back_button
+    end
+    @value = selected_button
   end
 end
 

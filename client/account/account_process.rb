@@ -15,7 +15,7 @@ class AccountProcess < BaseProcess
     @current_mode = :login_form
     @client_event = nil
     @login_status = 0
-    @actions = [:login_form,[:create_user,:input_user_id]]
+    @actions = [:login_form, [:create_user,:input_user_id], :select_job]
     @action_results = {}
   end
   def get_info

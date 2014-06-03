@@ -29,11 +29,11 @@ class Display
   def initialize_view
     #GameTcpClient.new.get_first_view
   end
-  def write(user_list, message_list)
+  def write(user_list, message_list, sub_message_list)
     init_screen
     write_main(user_list)
     write_sub(message_list)
-    write_side(message_list)
+    write_side(sub_message_list)
   end
   def is_movable?(x,y)
   end
@@ -70,10 +70,10 @@ sleep 0.02
     win = Window.new(@side_window_height, @side_window_width, @side_window_position_y , @side_window_position_x )
     win.box(?|, ?-)
     win.setpos(1,1)
-    #message_list.each_with_index do |message,i|
-    #  win.setpos(i, 1)
-    #  win.addstr(message + "\n")
-    #end
+    message_list.each_with_index do |message,i|
+      win.setpos(i, 1)
+      win.addstr(message + "\n")
+    end
     win.refresh
     win.close
   end

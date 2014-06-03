@@ -3,25 +3,27 @@
 #require './login_form_view.rb'
 require 'yaml'
 
-class LoginFormAction < BaseAction
+class SelectJobAction < BaseAction
   attr_reader :name
   def initialize(queue, tcp_client, process_results)
     @process_results = process_results
-
     @tcp_client = tcp_client
-    @name = :login_form
+    @name = :select_job
     @client_queue = queue
     @results = {}
-    @view = LoginFormView.new
+    @view = SelectJobView.new
     @action_end = false
-    @logger = Logger.new('./log/login_form_action_log')
+    @logger = Logger.new('./log/select_job_action_log')
     @logger.level = Logger::WARN
   end
   #ここはbaseに持っていけそう
   def execute
     while true
       event_result = nil
-      return if @view.is_end?
+      if @view.is_end?
+        @view.close_view
+        return
+      end
       @view.display
       sleep 0.2
       unless @client_queue.empty?
@@ -33,16 +35,12 @@ class LoginFormAction < BaseAction
       end
     end
   end
-  def evaluate_event_result(event_result)
-    @logger.error event_result.to_s
-    if event_result[:signup_button]
-      @results[:next_action_id] = 0
-    elsif event_result[:signup_button]
-      @results[:next_action_id] = 1
-    else
-      abort
-      exit
-    end
+  def evaluate_event_result(elements_info)
+    @logger.error "process_results = #{@process_results.to_s}"
+    @logger.error "elements_info = #{elements_info.to_s}"
+    user_id = @process_results[:create_user][:user_id]
+    @results[:job_id] = elements_info[:job_id]
+    @tcp_client.user_update(user_id, {:job_id => elements_info[:job_id]})
   end
 end
 

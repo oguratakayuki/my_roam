@@ -86,6 +86,12 @@ class BaseView
     win.box(?|, ?-)
     win.refresh
   end
+  def close_view
+    h,w,x,y = @main_setting[:positions].values_at(:height, :width, :x, :y)
+    win = Window.new(h,w,x,y)
+    win.refresh
+    win.close
+  end
 end
 
 

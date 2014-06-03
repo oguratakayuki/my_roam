@@ -5,7 +5,8 @@ require 'yaml'
 
 class CreateUserAction < BaseAction
   attr_reader :name
-  def initialize(queue, tcp_client)
+  def initialize(queue, tcp_client, process_results)
+    @process_results = process_results
     @tcp_client = tcp_client
     @name = :create_user
     @client_queue = queue
@@ -15,12 +16,12 @@ class CreateUserAction < BaseAction
     @logger = Logger.new('./log/create_user_log')
     @logger.level = Logger::WARN
   end
+  #ここはbaseに持っていけそう
   def execute
     while true
       event_result = nil
-      if @action_end
-        sleep 3
-        abort
+      #if @action_end
+      if @view.is_end?
         return
       end
       @view.debugger_action
@@ -38,18 +39,18 @@ class CreateUserAction < BaseAction
   def evaluate_event_result(elements_info)
     if @tcp_client.check_user_name(elements_info[:user_name])
       @logger.error "user name success"
-      exit
-      abort
-      user_id = @tcp_client.user_registration(event_result[:user_name], event_result[:password])
+      user_id = @tcp_client.user_registration(elements_info[:user_name], elements_info[:password])
+      @logger.error "!!!!!!!!!!user_id=#{user_id.to_s}"
     else
       @logger.error "user name error"
     end
 
-    @logger.error "!!!!!!!!!!return=#{ret.to_s}"
+    @logger.error "!!!!!!!!!!return=#{user_id.to_s}"
     @action_end = true
     @results[:login_type] = :new
-    @results[:user_name] = event_result[:user_name]
-    @results[:password] = event_result[:password]
+    @results[:user_id] = user_id
+    @results[:user_name] = elements_info[:user_name]
+    @results[:password] = elements_info[:password]
     @logger.error "!!!!!!!!!!return=#{@results.to_s}"
   end
 end
