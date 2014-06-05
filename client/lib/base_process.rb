@@ -33,7 +33,8 @@ class BaseProcess
     @action_results
   end
   def dispatch_event(action_name)
-    action = get_action(action_name).new(@client_queue, @tcp_client, @action_results)
+    #action = get_action(action_name).new(@client_queue, @action_results)
+    action = get_action(action_name).new(@action_results)
     action.execute
     set_action_result(action_name, action.results)
     if action.has_interrupt_next_action?

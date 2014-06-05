@@ -5,16 +5,12 @@ require 'yaml'
 
 require 'require_all'
 #gem 'require_all'
-require_all './account/actions/'
+require_all './game/actions/'
 
-class AccountProcess < BaseProcess
-  NEW_GAME = 0
-  CONTINUE = 1
+class GameProcess < BaseProcess
   def initialize
-    @current_mode = :login_form
-    @client_event = nil
     @login_status = 0
-    @actions = [:login_form, [:create_user,:input_user_id], :select_job]
+    @actions = [:play_game, :save_and_logout]
     @action_results = {}
   end
   def get_info

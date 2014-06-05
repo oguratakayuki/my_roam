@@ -5,11 +5,9 @@ require 'yaml'
 
 class SelectJobAction < BaseAction
   attr_reader :name
-  def initialize(queue, tcp_client, process_results)
+  def initialize(process_results)
     @process_results = process_results
-    @tcp_client = tcp_client
     @name = :select_job
-    @client_queue = queue
     @results = {}
     @view = SelectJobView.new
     @action_end = false
@@ -26,8 +24,8 @@ class SelectJobAction < BaseAction
       end
       @view.display
       sleep 0.2
-      unless @client_queue.empty?
-        key = @client_queue.deq
+      unless ApplicationContext.instance.client_queue.empty?
+        key = ApplicationContext.instance.client_queue.deq
         send_event(key)
         if @view.is_end?
           evaluate_event_result(@view.elements_info)
@@ -40,7 +38,7 @@ class SelectJobAction < BaseAction
     @logger.error "elements_info = #{elements_info.to_s}"
     user_id = @process_results[:create_user][:user_id]
     @results[:job_id] = elements_info[:job_id]
-    @tcp_client.user_update(user_id, {:job_id => elements_info[:job_id]})
+    ApplicationContext.instance.tcp_client.user_update(user_id, {:job_id => elements_info[:job_id]})
   end
 end
 

@@ -95,4 +95,48 @@ class GameTcpClient
     s.close
     return
   end
+
+  def create_receive_process
+    #q = Queue.new
+    #Thread.start do
+    #  server = TCPServer.new(10006)
+    #  begin
+    #    while true
+    #      client = server.accept
+    #      message = client.gets
+    #      next if message == nil
+    #      message = message.chomp
+    #      message = JSON.parse(message)
+    #      client.puts 'ok'
+    #      q.push(message)
+    #      client.close
+    #    end
+    #  rescue
+    #  ensure
+    #    client.close
+    #  end
+    #end
+    #return q
+    server_queue = Queue.new
+    server = TCPServer.new(10006)
+    Thread.start do
+      while true
+        # クライアントからの接続をacceptする
+        sock = server.accept
+        # クライアントからのデータを全て受け取る
+        message = sock.gets
+        next if message == nil
+        message = message.chomp
+        message = JSON.parse(message)
+        server_queue.push(message)
+        # acceptしたソケットを閉じる
+        sock.close
+      end
+    end
+    server_queue
+  end
+
+
+
+
 end

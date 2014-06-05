@@ -31,6 +31,10 @@ class BaseView
   def move_element(direction=nil, option=nil)
     @elements.move(direction, option)
   end
+
+  def find_element_by_key(key)
+    @elements.find_by_key(key)
+  end
   def key_event(key)
     #result = current_element.key_event(key)
     result = @elements.current.key_event(key)

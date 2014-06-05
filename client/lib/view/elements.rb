@@ -196,3 +196,98 @@ class RadioElement < BaseElement
   end
 end
 
+
+
+
+
+
+
+
+class WindowElement < BaseElement
+  attr_accessor :attributes, :element_id, :value, :end_call, :buttons
+  def initialize(element_id, h, w, x, y, title, attributes)
+    @element_id, @h, @w, @x, @y, @title, @attributes =  element_id, h, w, x, y, title, attributes
+    @text = ''
+    @selected = false
+    @end_call = false
+    #setup_buttons
+    @field_data = nil
+  end
+  def update_field_data(field_data)
+    @field_data = field_data
+  end
+  def draw(win)
+    win.setpos(@y, @x)
+    up_down_str = '-'*@w
+    win.addstr(up_down_str)
+    for height in @y..(@y+@h) do
+      win.setpos(height, @x)
+      win.addstr('|')
+      win.setpos(height, @x+@w)
+      win.addstr('|')
+    end
+    win.setpos(@y + @h, @x)
+    win.addstr(up_down_str)
+
+    @field_data.each do |user|
+      win.setpos( @y + user['y'], @x + user['x'])
+      if user['type'] == 'enemy'
+        win.addstr('E')
+      else
+        win.addstr(user['user_id'].to_s)
+      end
+    end if @field_data.is_a?(Array)
+
+  end
+  def key_event(key)
+    #if Curses::Key::RIGHT == key
+    #  next_button
+    #else Curses::Key::LEFT == key
+    #  back_button
+    #end
+    #@value = selected_button
+  end
+end
+
+
+class ListElement < BaseElement
+  attr_accessor :attributes, :element_id, :value, :end_call, :buttons
+  def initialize(element_id, h, w, x, y, title, attributes)
+    @element_id, @h, @w, @x, @y, @title, @attributes =  element_id, h, w, x, y, title, attributes
+    @text = ''
+    @selected = false
+    @end_call = false
+    #setup_buttons
+    @field_data = nil
+  end
+  def update_list_data(list_data)
+    @list_data = list_data
+  end
+  def draw(win)
+    win.setpos(@y, @x)
+    up_down_str = '-'*@w
+    win.addstr(up_down_str)
+    for height in @y..(@y+@h) do
+      win.setpos(height, @x)
+      win.addstr('|')
+      win.setpos(height, @x+@w)
+      win.addstr('|')
+    end
+    win.setpos(@y + @h, @x)
+    win.addstr(up_down_str)
+
+    @list_data.each_with_index do |data,i|
+      win.setpos( (@y + i + 1), (@x + 1))
+      win.addstr(data)
+    end if @list_data.is_a?(Array)
+  end
+
+end
+
+
+
+
+
+
+
+

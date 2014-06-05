@@ -5,12 +5,9 @@ require 'yaml'
 
 class LoginFormAction < BaseAction
   attr_reader :name
-  def initialize(queue, tcp_client, process_results)
+  def initialize(process_results)
     @process_results = process_results
-
-    @tcp_client = tcp_client
     @name = :login_form
-    @client_queue = queue
     @results = {}
     @view = LoginFormView.new
     @action_end = false
@@ -24,8 +21,8 @@ class LoginFormAction < BaseAction
       return if @view.is_end?
       @view.display
       sleep 0.2
-      unless @client_queue.empty?
-        key = @client_queue.deq
+      unless ApplicationContext.instance.client_queue.empty?
+        key = ApplicationContext.instance.client_queue.deq
         send_event(key)
         if @view.is_end?
           evaluate_event_result(@view.elements_info)

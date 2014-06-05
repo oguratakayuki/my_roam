@@ -1,0 +1,55 @@
+:main_frame:
+  :positions:
+    :x: 10
+    :y: 10
+    :width: 170
+    :height: 130
+
+:forms:
+  :play_game:
+    :positions:
+      :x: 10
+      :y: 10
+      :width: 170
+      :height: 50
+    :elements:
+      - :id: 0
+        :type: window
+        :title: 'Main Window'
+        :attributes:
+          :is_selectable: 1
+          :is_clickable: 0
+          :selected_title: '->new'
+          :key: 'main_window'
+        :h: 30
+        :w: 60
+        :x: 50
+        :y: 1
+      - :id: 1
+        :type: list
+        :title: 'user act log'
+        :attributes:
+          :is_selectable: 1
+          :is_clickable: 0
+          :selected_title: '->user act log'
+          :key: 'sub_window'
+        :h: 10
+        :w: 60
+        :x: 50
+        :y: 32
+
+#      - :id: 2
+#        :title: 'user status'
+#        :type: list
+#        :attributes:
+#          :is_selectable: 1
+#          :is_clickable: 0
+#          :selected_title: '->user status'
+#          :key: 'user_status'
+#          :value: ''
+#        :h: 30
+#        :w: 20
+#        :x: 120 
+#        :y: 15
+#
+ 

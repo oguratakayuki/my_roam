@@ -60,7 +60,7 @@ class ElementsIterator
     current.set_selected(true)
   end
   def move_by_attribute(direction, option)
-    #if @elements.index{|t| t.__send__(option.to_s) == true}
+    #is_selectableが1のデータが1つでもあればそこまで移動
     if @elements.index{|t| t.attributes[option] == 1}
       while true do
         __send__("move_#{direction}_one")
@@ -68,6 +68,13 @@ class ElementsIterator
       end
     end
   end
+
+  def find_by_key(key)
+    @elements.find{|t| t.key == key}
+  end
+
+
+
   def move_forth_one
     if @current_element_id + 1 < @element_counts
       @current_element_id = @current_element_id += 1
