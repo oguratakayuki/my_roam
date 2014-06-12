@@ -32,10 +32,10 @@ class PlayGameAction < BaseAction
       if ApplicationContext.instance.server_queue.empty? == false
         message = ApplicationContext.instance.server_queue.pop
         if message.instance_of?(Hash) && message['cmd'] == 'update_all_user_position'
+          #エフェクトも含む
           @logger.error "move message #{message['params'].to_s}}"
           updated_user_position_list = message['params']
           @view.update_main(updated_user_position_list)
-          #@view.update_side(chara.get_message)
           #@view.update_sub(sub_message_list)
           @view.update_sub(chara.get_message)
           @view.display
@@ -54,6 +54,18 @@ class PlayGameAction < BaseAction
           ApplicationContext.instance.tcp_client.move(user_info[:user_id], chara.x, chara.y - 1) and chara.move(0, -1)
         when Curses::Key::DOWN
           ApplicationContext.instance.tcp_client.move(user_info[:user_id], chara.x, chara.y + 1) and chara.move(0, 1)
+        when 's'
+          #後ろ攻撃#判定、effectはサーバーからうけとる
+          ApplicationContext.instance.tcp_client.attack(user_info[:user_id], chara.x, chara.y, 'left') #and chara.move(0, 1)
+        when 'e'
+          #上段攻撃
+          ApplicationContext.instance.tcp_client.attack(user_info[:user_id], chara.x, chara.y, 'up') #and chara.move(0, 1)
+        when 'f'
+          #前方攻撃
+          ApplicationContext.instance.tcp_client.attack(user_info[:user_id], chara.x, chara.y, 'right') #and chara.move(0, 1)
+        when 'd'
+          #下段攻撃
+          ApplicationContext.instance.tcp_client.attack(user_info[:user_id], chara.x, chara.y, 'down') #and chara.move(0, 1)
         else
           abort
           close_screen

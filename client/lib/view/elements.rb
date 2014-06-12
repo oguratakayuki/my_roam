@@ -198,8 +198,15 @@ end
 
 
 
+class EffectObject
+  def initialize(id,type,h,w,x,y,life_time)
+  end
+  def draw(win)
+  end
+end
 
-
+class EffectObjectList
+end
 
 
 
@@ -217,6 +224,9 @@ class WindowElement < BaseElement
     @field_data = field_data
   end
   def draw(win)
+
+
+
     win.setpos(@y, @x)
     up_down_str = '-'*@w
     win.addstr(up_down_str)
@@ -228,15 +238,49 @@ class WindowElement < BaseElement
     end
     win.setpos(@y + @h, @x)
     win.addstr(up_down_str)
-
-    @field_data.each do |user|
-      win.setpos( @y + user['y'], @x + user['x'])
-      if user['type'] == 'enemy'
-        win.addstr('E')
-      else
-        win.addstr(user['user_id'].to_s)
+    #user_list=[{:user_id=>1, :ip=>nil, :x=>47, :y=>2, :type=>"enemy", :hp=>100}, {:user_id=>2, :ip=>"192.168.12.25", :x=>32, :y=>8, :type=>nil, :hp=>100}
+    # [{"user_id"=>1, "ip"=>nil, "x"=>59, "y"=>17, "type"=>"enemy", "hp"=>100}, {"user_id"=>2,
+    #これを
+    #user_list=[{:type => user, :x=> 1, :y =>1, :effect => :attacked}, {:type => "effect", :effect_id => 1, :x => 1, :y => 1}...にする
+    @field_data.each do |f_d|
+      win.setpos( @y + f_d['y'], @x + f_d['x'])
+      if ['enemy','user'].include?(f_d['type'])
+        chara_string = user_type_to_chara(f_d['type'], f_d['user_id'])
+        if f_d['attr'].key?('effect') && f_d['attr']['effect'] != nil
+          Curses.start_color
+          Curses.init_pair 1, Curses::COLOR_RED, Curses::COLOR_BLACK
+          Curses.init_pair 2, Curses::COLOR_BLACK, Curses::COLOR_RED
+          win.attron(Curses.color_pair(1))
+          #win.attrset(Curses.color_pair(1))
+          win.addstr("!"+ chara_string.to_s)
+          win.attroff(Curses.color_pair(1))
+        else
+          win.addstr(chara_string.to_s)
+        end
+      elsif f_d['type'] == 'effect'
+        if f_d['attr']['effect_type'] == 'attack_fail'
+          case f_d['attr']['direction']
+          when 'left'
+            win.addstr("<")
+          when 'up'
+            win.addstr("^")
+          when 'right'
+            win.addstr(">")
+          when 'down'
+            win.addstr("l")
+          end
+        end
       end
     end if @field_data.is_a?(Array)
+
+    def user_type_to_chara(type, user_id)
+      case type
+      when 'user'
+        user_id
+      when 'enemy'
+        'E'
+      end
+    end
 
   end
   def key_event(key)
@@ -258,7 +302,7 @@ class ListElement < BaseElement
     @selected = false
     @end_call = false
     #setup_buttons
-    @field_data = nil
+    @list_data = []
   end
   def update_list_data(list_data)
     @list_data = list_data

@@ -24,7 +24,7 @@ class User
     @x = x
     @y = y
   end
-  def job_id(job_id)
+  def change_job(job_id)
     @job_id = job_id
   end
   def next_pos_by_key(key)
@@ -117,6 +117,20 @@ class UserList
     user.login
   end
 
+  def user_change_job(user_id, job_id)
+    user = @user_list.detect{|t| t.id == user_id}
+    user.change_job(job_id)
+  end
+
+  def attack(attacker_user_id, attacked_user_id)
+    attacker = find(attacker_user_id)
+    attacked = find(attacked_user_id)
+    if attacker && attacked
+      attacked.hp = attacked.hp - 10
+      return true
+    end
+    return false
+  end
 end
 
 

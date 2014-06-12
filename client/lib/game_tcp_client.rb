@@ -68,6 +68,11 @@ class GameTcpClient
     self.send_only(message)
   end
 
+  def user_change_job(user_id, job_id)
+    message = {'cmd' => "user_change_job", 'params' => {'user_id' => user_id, 'job_id' => job_id} }.to_json
+    self.send_only(message)
+  end
+
 
   def move(user_id, x, y)
     message = {'cmd' => "move", :params => {:user_id => user_id, :x => x, :y => y}}.to_json
@@ -75,6 +80,11 @@ class GameTcpClient
     result = JSON.parse(result)['move_status']
     @logger.error "move return=#{result.to_s}"
     return result
+  end
+
+  def attack(user_id, x, y, direction)
+    message = {'cmd' => "attack", :params => {:user_id => user_id, :x => x, :y => y, :direction => direction}}.to_json
+    result = self.send_only(message)
   end
 
   def send(message_with_json, ip=nil, port=nil)

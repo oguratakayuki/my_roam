@@ -17,14 +17,14 @@ class GameTcpServer
     @map = Map.new
   end
 
-  def send_message_to_all_client(cmd, ips, user_list)
+  def send_message_to_all_client(cmd, ips, map_list)
     if cmd == 'update_all_user_position'
-      message = {'cmd' => 'update_all_user_position', :params => user_list}.to_json
+      message = {'cmd' => 'update_all_user_position', :params => map_list}.to_json
     end
     if ips
       ips.each do |ip|
         if ip[:ip]
-          @logger.error "send_message_to_all_client!!!ip=#{ip[:ip]},user_list=#{user_list.to_s}"
+          @logger.error "send_message_to_all_client!!!ip=#{ip[:ip]},user_list=#{map_list.to_s}"
           self.send_only(message, ip[:ip])
         end
       end
@@ -42,6 +42,7 @@ class GameTcpServer
     server = TCPServer.open(@receive_port=10005)
     # クライアントからの接続を待つ
     set_enemy
+    set_effect_remove_thread
     while true
       # クライアントからの入力を出力(1行のみ)
       Thread.start(server.accept) do |sock|
@@ -62,14 +63,14 @@ class GameTcpServer
         elsif message['cmd'] == 'move'
           @logger.error 'move accepted'
           user = @user_list.find(message['params']['user_id'])
-          move_status = @map.move(user.id, user.x, user.y, message['params']['x'], message['params']['y'])
+          move_status = @map.move('user', user.id, user.x, user.y, message['params']['x'], message['params']['y'])
           if move_status
             user.update_position(message['params']['x'], message['params']['y'])
           end
           result = {:move_status => move_status}.to_json
           sock.puts result
           if move_status
-            send_message_to_all_client('update_all_user_position', @user_list.ips, @user_list.infos)
+            send_message_to_all_client('update_all_user_position', @user_list.ips, @map.export)
           end
         elsif message['cmd'] == 'get_display_info'
           window_info = Hash.new
@@ -93,7 +94,7 @@ class GameTcpServer
         elsif message['cmd'] == 'init_user_position'
           #position決定
           position = @map.find_free_space.sample
-          @map.move(message['params']['user_id'], nil, nil, position['x'], position['y'])
+          @map.move('user', message['params']['user_id'], nil, nil, position['x'], position['y'])
           #position = {'x' => 3, 'y' => 4}
           #更新
           @user_list.update_by_id(message['params']['user_id'], position['x'], position['y'])
@@ -101,7 +102,7 @@ class GameTcpServer
           position = position.to_json
           #新規ユーザーにはpositionを返す
           sock.puts position
-          send_message_to_all_client('update_all_user_position', @user_list.ips, @user_list.infos)
+          send_message_to_all_client('update_all_user_position', @user_list.ips, @map.export)
         elsif message.key?('cmd')
           puts "accept method is " + message['cmd']
           if self.methods.include?(message['cmd'].to_sym)
@@ -143,8 +144,47 @@ class GameTcpServer
     user = @user_list.user_login(params['user_id'])
 puts 'USER LOGIN IS CALLED params =' + params.to_s
   end
+  def user_change_job(params, remote_ip)
+    @user_list.user_change_job(params['user_id'], params['job_id'])
+  end
+
+  def attack(params, remote_ip)
+    #"user_id":2,"x":57,"y":24,"direction":"back"
+    attacker_user_id = params[:user_id]
+    pos = @map.x_y_with_direction(params['x'], params['y'], params['direction'])
+    if pos == {}
+      puts "ERROR POSITION ATTACK FAIL!!!!!!!!!!!!!!!!!!!!"
+      return
+    else
+      puts "POSITION OK!!!!!!!!!!!!!!!!!#{pos.to_s}"
+    end
+    attacked_user_id = @map.find_user_id(pos[:x], pos[:y])
+    puts "!!!!!!!attacked user_id = #{attacked_user_id.to_s}"
+    puts "!!!!!!!attacked user_id = #{attacked_user_id.to_s}"
+    if attacked_user_id
+      @user_list.attack(attacker_user_id, attacked_user_id)
+      puts 'attack success'
+      @map.add_attacked_effect(attacked_user_id)
+    else
+      weapon_id = 1
+      puts 'start to write attack fail effect'
+      @map.add_attack_fail_effect(pos[:x], pos[:y], weapon_id, params['direction'])
+    end
+    #exist? enemy?
+    send_message_to_all_client('update_all_user_position', @user_list.ips, @map.export)
+  end
 
 
+  def set_effect_remove_thread
+    Thread.start do
+      while true
+        sleep 0.5
+        puts "count down effect start"
+        @map.count_down_effect
+      end
+
+    end
+  end
 
   def set_enemy
     Thread.start do
@@ -155,10 +195,10 @@ puts 'USER LOGIN IS CALLED params =' + params.to_s
       enemy = @user_list.get_new_enemy
       @logger.error "enemy id #{enemy.id}"
       position = @map.find_free_space.sample
-      @map.move(enemy.id, nil, nil, position['x'], position['y'])
+      @map.move('enemy', enemy.id, nil, nil, position['x'], position['y'])
       @user_list.update_by_id(enemy.id, position['x'], position['y'])
       while true
-        sleep 0.5
+        sleep 2.5
         Signal.trap(:TSTP) do
           puts "敵など見せます"
           puts ''
@@ -179,11 +219,12 @@ puts 'USER LOGIN IS CALLED params =' + params.to_s
         action_info = enemy.next_action
         if action_info[:type] == 'walk'
           next_pos = action_info[:params][:next_pos]
-          move_status = @map.move(enemy.id, enemy.x, enemy.y, next_pos[:x], next_pos[:y])
+          move_status = @map.move('enemy', enemy.id, enemy.x, enemy.y, next_pos[:x], next_pos[:y])
           if move_status
             puts "!!!ENEMY MOVE OK x=#{next_pos[:x]},y=#{next_pos[:y]}"
+            puts @map.export.to_s
             enemy.update_position(next_pos[:x], next_pos[:y])
-            send_message_to_all_client('update_all_user_position', @user_list.ips, @user_list.infos)
+            send_message_to_all_client('update_all_user_position', @user_list.ips, @map.export)
             puts "!!ENEMY MOVE SEND END"
           end
         end

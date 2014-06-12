@@ -38,7 +38,7 @@ class SelectJobAction < BaseAction
     @logger.error "elements_info = #{elements_info.to_s}"
     user_id = @process_results[:create_user][:user_id]
     @results[:job_id] = elements_info[:job_id]
-    ApplicationContext.instance.tcp_client.user_update(user_id, {:job_id => elements_info[:job_id]})
+    ApplicationContext.instance.tcp_client.user_change_job(user_id, elements_info[:job_id])
   end
 end
 
